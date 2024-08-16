@@ -7,8 +7,8 @@ CELL_SIZE = 120
 WIDTH = COLUMNS * CELL_SIZE
 HEIGHT = ROWS * CELL_SIZE
 
-RED = 0
-YELLOW = 1
+RED = 1
+YELLOW = 2
 
 class Game:
   def __init__(self) -> None:
