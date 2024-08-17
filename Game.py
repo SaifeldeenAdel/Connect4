@@ -15,8 +15,7 @@ class Game:
     self.current_state = np.zeros((8,8), dtype=np.int8)
     self.current_state = StateHelper.insert(self.current_state,7,1)
     self.current_state = StateHelper.insert(self.current_state,2,1)
-    self.current_state = StateHelper.insert(self.current_state,7,1)
-    self.current_state = StateHelper.insert(self.current_state,7,1)
+    self.K = input("Enter K (max depth of tree): ")
 
     print(self.current_state)
     self.initialiseBoard()
@@ -65,7 +64,7 @@ class Game:
     for i in range(COLUMNS+1):
         pygame.draw.line(self.surface, (0, 0, 0), (i * CELL_SIZE, 0),
                           (i * CELL_SIZE, HEIGHT), 2)
-    
+        
     self.minimax_btn = self.make_button("Minimax", WIDTH+40, 200, 120, 40 )
     self.pruning_btn = self.make_button("Minimax a-B", WIDTH+20, 260, 160, 40 )
     self.expecti_btn = self.make_button("Expecti", WIDTH+40, 320, 120, 40 )
@@ -85,6 +84,7 @@ class Game:
     self.surface.blit(text, text.get_rect(center=rect.center))
     return rect
     
-
+  def game_end(self):
+    return not np.any(self.current_state == 0)
 
   

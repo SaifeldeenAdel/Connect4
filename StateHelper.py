@@ -11,7 +11,7 @@ class StateHelper:
   
   @staticmethod
   def insert(state: np.ndarray, col: int, value: int) -> bool:
-    if value is not RED or value is not YELLOW:
+    if value not in [1, 2]:
       raise ValueError("Invalid value. Must be 1 (RED) or 2 (YELLOW).")
 
     valid_row = StateHelper.getValidSpace(state, col)
