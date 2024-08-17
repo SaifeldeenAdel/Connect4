@@ -40,13 +40,38 @@ class GameState:
   def get_heuristic(self):
     pass
 
-  def __getConnected4s(state):
+  def __getConnected4s(self, player):
+    count = 0
+    # Check horizontal lines
+    for row in range(self.state.shape[0]):
+        for col in range(self.state.shape[1] - 3):
+            if np.all(self.state[row, col:col+4] == player):
+                count += 1
+
+    # Check vertical lines
+    for col in range(self.state.shape[1]):
+        for row in range(self.state.shape[0] - 3):  
+            if np.all(self.state[row:row+4, col] == player):
+                count += 1
+
+    # Check positive diagonals (bottom-left to top-right)
+    for row in range(3, self.state.shape[0]):
+        for col in range(self.state.shape[1] - 3):
+            if np.all([self.state[row-i, col+i] == player for i in range(4)]):
+                count += 1
+
+    # Check negative diagonals (top-left to bottom-right)
+    for row in range(self.state.shape[0] - 3):
+        for col in range(self.state.shape[1] - 3):
+            if np.all([self.state[row+i, col+i] == player for i in range(4)]):
+                count += 1
+
+    return count # This can be multiplied by some large factor for the heuristic
+  
+  def __getConnected3s(self, player):
     pass 
   
-  def __getConnected3s(state):
-    pass 
-  
-  def __getCenterDistribution(state):
+  def __getCenterDistribution(self, player):
     pass
 
   def __repr__(self) -> str:
