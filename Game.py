@@ -1,6 +1,7 @@
 import pygame
 import numpy as np
-from StateHelper import StateHelper
+from treelib import Tree
+from GameState import GameState
 
 from constants import EMPTY, RED, YELLOW
 from constants import WIDTH, HEIGHT, COLUMNS, ROWS, CELL_SIZE
@@ -12,12 +13,13 @@ class Game:
     self.playing = False
     self.player = RED
     self.mode = None
-    self.current_state = np.zeros((8,8), dtype=np.int8)
-    self.current_state = StateHelper.insert(self.current_state,7,1)
-    self.current_state = StateHelper.insert(self.current_state,2,1)
-    self.K = input("Enter K (max depth of tree): ")
+    self.tree = Tree()
 
-    print(self.current_state)
+    self.current_state = GameState(np.zeros((8,8), dtype=np.int8), id=0)
+    print(len(self.current_state.get_neighbors(self.player)))
+    
+    # self.K = input("Enter K (max depth of tree): ")
+
     self.initialiseBoard()
 
   def initialiseBoard(self):
@@ -56,6 +58,8 @@ class Game:
     
     pygame.display.update()
 
+  
+
     
   def make_grid_and_buttons(self):
     for i in range(ROWS+1):
@@ -73,7 +77,9 @@ class Game:
     self.font = pygame.font.Font(None, 33)
     color = (255,0,0) if self.player == RED else (180,140,0)
     player_text = self.font.render(f"Player: {'RED' if self.player is RED else 'YELLOW'}", True, color) 
+    mode = self.font.render(f"Mode: {self.mode}", True, (0,0,0)) 
     self.surface.blit(player_text, (WIDTH+20, 100)) 
+    self.surface.blit(mode, (WIDTH+20, 600)) 
 
   def make_button(self, text, x, y, width, height):
     rect = pygame.Rect(x, y, width, height)
