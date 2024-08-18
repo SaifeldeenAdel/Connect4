@@ -1,10 +1,10 @@
 import numpy as np
-from constants import EMPTY, RED, YELLOW, COLUMNS, ROWS
+from constants import EMPTY, HUMAN , AI, COLUMNS, ROWS
 
 class GameState:
   def __init__(self, state: np.ndarray, id : int = None):
     self.state = state
-    self.score = self.get_heuristic()
+    self.score = 0
     self.tree_id = id
     
   # Returns a list of columns that have empty rows left
@@ -37,7 +37,10 @@ class GameState:
 
     return neighbors
   
-  def get_heuristic(self):
+  def is_terminal(self, player):
+    return not np.any(self.state == 0)
+  
+  def get_heuristic(self, player):
     pass
 
   def __getConnected4s(self, player):

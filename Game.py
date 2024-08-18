@@ -1,9 +1,10 @@
 import pygame
 import numpy as np
+import random
 from treelib import Tree
 from GameState import GameState
 
-from constants import EMPTY, RED, YELLOW
+from constants import EMPTY, HUMAN, AI
 from constants import WIDTH, HEIGHT, COLUMNS, ROWS, CELL_SIZE
 from constants import MINIMAX, MINIMAX_PRUNE, EXPECTI
 
@@ -11,13 +12,13 @@ class Game:
   def __init__(self) -> None:
     pygame.init()
     self.playing = False
-    self.player = RED
+    self.player = HUMAN if random.random() >= 0.5 else AI
     self.mode = None
     self.tree = Tree()
 
     self.current_state = GameState(np.zeros((8,8), dtype=np.int8), id=0)
     print(len(self.current_state.get_neighbors(self.player)))
-    
+
     # self.K = input("Enter K (max depth of tree): ")
 
     self.initialiseBoard()
@@ -42,7 +43,7 @@ class Game:
       if event.type == pygame.MOUSEBUTTONDOWN:
         if self.minimax_btn.collidepoint(event.pos):
             self.mode = MINIMAX
-            self.player = YELLOW
+            # self.player = HUMAN if self.player == AI else AI
 
         if self.pruning_btn.collidepoint(event.pos):
             self.mode = MINIMAX_PRUNE
@@ -55,6 +56,14 @@ class Game:
     self.surface.fill((202, 228, 241))
     self.make_grid_and_buttons()
     self.update_text()
+
+    if self.player == AI and self.mode:
+      pass
+      # print("Running algo")
+    elif self.player == HUMAN:
+      # print("Waiting for click")
+      pass
+      
     
     pygame.display.update()
 
@@ -75,8 +84,8 @@ class Game:
 
   def update_text(self):
     self.font = pygame.font.Font(None, 33)
-    color = (255,0,0) if self.player == RED else (180,140,0)
-    player_text = self.font.render(f"Player: {'RED' if self.player is RED else 'YELLOW'}", True, color) 
+    color = (255,0,0) if self.player == HUMAN else (180,140,0)
+    player_text = self.font.render(f"Player: {'HUMAN' if self.player is HUMAN else 'AI'}", True, color) 
     mode = self.font.render(f"Mode: {self.mode}", True, (0,0,0)) 
     self.surface.blit(player_text, (WIDTH+20, 100)) 
     self.surface.blit(mode, (WIDTH+20, 600)) 
