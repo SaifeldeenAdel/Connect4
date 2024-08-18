@@ -1,4 +1,4 @@
-from constants import MAX_BITS_PER_STATE, COLUMNS, ROWS, NUM_BITS_PER_COLUMN
+from constants import MAX_BITS_PER_STATE, COLUMNS, ROWS, NUM_BITS_PER_COLUMN, BITS_FOR_COLS
 import numpy as np
 
 
@@ -17,27 +17,27 @@ class InternalState:
 
     def get_numpy_format(self) -> np.ndarray:
         #  0 in array -> EMPTY
-        #  1 in array -> player 1 -> RED
-        #  2 in array -> player 2 -> YELLOW
+        #  1 in array -> player 1 -> RED     binary 0
+        #  2 in array -> player 2 -> YELLOW  binary 1
         #  BINARY 0 -> RED
         #  BINARY 1 -> YELLOW
         binary_state = self.get_binary_state()
         nparray = np.zeros((ROWS, COLUMNS))
         # print(nparray)
-        num_occupied = NUM_BITS_PER_COLUMN - ROWS
+
 
         for col in range(COLUMNS):
-            print(f"column {col}")
+            #print(f"column {col}")
             start = col * NUM_BITS_PER_COLUMN
             end = start + NUM_BITS_PER_COLUMN
-            print(f"start {start} and end {end}")
+            #print(f"start {start} and end {end}")
             column_representation = binary_state[start: end]
-            print(f"column representation {column_representation}")
-            num_rows_occupied = int(column_representation[:num_occupied], 2)
-            print(f"num_rows_occupied {num_rows_occupied}")
-            disks = column_representation[num_occupied:]
-            disks = column_representation[-num_rows_occupied:]
-            print(f"disks {disks}")
+            #print(f"column representation {column_representation}")
+            num_rows_occupied = int(column_representation[:BITS_FOR_COLS], 2)
+            #print(f"num_rows_occupied {num_rows_occupied}")
+
+            disks = column_representation[BITS_FOR_COLS: BITS_FOR_COLS + num_rows_occupied]
+            #print(f"disks {disks}")
             i = 0
             start_row = ROWS - 1
             end_row = start_row - num_rows_occupied
@@ -49,8 +49,8 @@ class InternalState:
 
 
 # binary_string = '010 000000 100 000001 001 000001 100 001110 011 000001 001 000001 000 000000'
-binary_string = '010 000000 100 000001 001 000001 100 001110 011 000001 001 000001 000 000000'
+binary_string = '010 000000 100 000100 001 100000 100 111000 011 001000 001 100000 000 000000'
 decimal_number = int(binary_string.replace(" ", ""), 2)
 
 b = InternalState(decimal_number)
-print(b.get_numpy_format())
+#print(b.get_numpy_format())
