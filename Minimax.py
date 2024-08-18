@@ -1,5 +1,5 @@
 from constants import AI, HUMAN
-from GameState import GameState
+from BoardState import BoardState
 import math
 
 class Minimax:
@@ -9,7 +9,7 @@ class Minimax:
     self.alpha = None
     self.beta = None
 
-  def run(self, state : GameState, depth, player):
+  def run(self, state : BoardState, depth, player):
     neighbors = state.get_neighbors(player) 
 
     if state.is_terminal() or depth == 0:

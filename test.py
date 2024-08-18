@@ -1,4 +1,4 @@
-from GameState import GameState
+from BoardState import BoardState
 
 def test_8139(state, player):
   # Runs our minimax pruning algorithm?
