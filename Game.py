@@ -3,6 +3,7 @@ import numpy as np
 import random
 from treelib import Tree
 from GameState import GameState
+from Disk import Disk
 
 from constants import EMPTY, HUMAN, AI
 from constants import WIDTH, HEIGHT, COLUMNS, ROWS, CELL_SIZE
@@ -16,8 +17,8 @@ class Game:
     self.mode = None
     self.tree = Tree()
 
+    self.disks = [0 for _ in range(42)] # Pool of disks to use
     self.current_state = GameState(np.zeros((8,8), dtype=np.int8), id=0)
-    print(len(self.current_state.get_neighbors(self.player)))
 
     # self.K = input("Enter K (max depth of tree): ")
 
@@ -42,14 +43,19 @@ class Game:
           quit(0)
       if event.type == pygame.MOUSEBUTTONDOWN:
         if self.minimax_btn.collidepoint(event.pos):
-            self.mode = MINIMAX
-            # self.player = HUMAN if self.player == AI else AI
+          self.mode = MINIMAX
+          # self.player = HUMAN if self.player == AI else AI
 
-        if self.pruning_btn.collidepoint(event.pos):
-            self.mode = MINIMAX_PRUNE
+        elif self.pruning_btn.collidepoint(event.pos):
+          self.mode = MINIMAX_PRUNE
 
-        if self.expecti_btn.collidepoint(event.pos):
-            self.mode = EXPECTI
+        elif self.expecti_btn.collidepoint(event.pos):
+          self.mode = EXPECTI
+        else:
+          # Handle human move
+          if self.player == HUMAN:
+            col = event.pos[0] // CELL_SIZE  # Determine the clicked column
+            self.handle_human_move(col)
 
 
   def update(self):
@@ -57,19 +63,29 @@ class Game:
     self.make_grid_and_buttons()
     self.update_text()
 
+    # Update pool of disks based on state and draw them
+    self.set_disks()
+    for disk in self.disks:
+      if disk:
+        disk.draw(self.surface)
+
     if self.player == AI and self.mode:
-      pass
-      # print("Running algo")
-    elif self.player == HUMAN:
-      # print("Waiting for click")
-      pass
-      
-    
+      print("Running algo")
+
     pygame.display.update()
 
-  
+  # Creates new disk objects if need or updates existing objects
+  def set_disks(self):
+    for i,row in enumerate(self.current_state.state):
+      for j,player in enumerate(row):
+        if player:
+          if not self.disks[i*j]:
+            self.disks[i*j] = Disk(i,j,player)
+          else:
+            self.disks[i*j].set_pos(i,j)
+            self.disks[i*j].set_color(player)
 
-    
+
   def make_grid_and_buttons(self):
     for i in range(ROWS+1):
         pygame.draw.line(self.surface, (0, 0, 0), (0, (i) * CELL_SIZE),
@@ -99,6 +115,12 @@ class Game:
     self.surface.blit(text, text.get_rect(center=rect.center))
     return rect
     
+
+  def handle_human_move(self, col):
+    self.current_state = self.current_state.insert(col, HUMAN)
+    # self.player = AI  # Switch to AI after the human move
+      
+
   def game_end(self):
     return not np.any(self.current_state == 0)
 

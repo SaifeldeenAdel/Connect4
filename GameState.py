@@ -24,8 +24,8 @@ class GameState:
         if new_state[row, col] == EMPTY:
             new_state[row, col] = player
             return GameState(new_state)
-      
-    raise ValueError("Invalid Move")
+    print("Invalid Move")
+    return self
 
   def get_neighbors(self, player: int):
     neighbors = []
