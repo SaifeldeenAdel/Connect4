@@ -23,8 +23,19 @@ class Game:
         self.tree = Tree()
 
         self.disks = [0 for _ in range(42)]  # Pool of disks to use
+        
 
         self.current_state = BoardState(InternalState(INITIAL_STATE))
+
+        # self.current_state = self.current_state.insert(1, self.human)
+        # self.current_state = self.current_state.insert(1, self.human)
+        # self.current_state = self.current_state.insert(1, self.human)
+        # self.current_state = self.current_state.insert(1, self.human)
+        # self.current_state = self.current_state.insert(1, self.human)
+        # self.current_state = self.current_state.insert(1, self.human)
+        # self.current_state = self.current_state.insert(1, self.human)
+        print(self.current_state.state.get_numpy_format())
+
 
         # self.K = input("Enter K (max depth of tree): ")
 
@@ -85,11 +96,12 @@ class Game:
         for i, row in enumerate(self.current_state.state.get_numpy_format()):
             for j, player in enumerate(row):
                 if player:
-                    if not self.disks[i * j]:
-                        self.disks[i * j] = Disk(i, j, player)
+                    index = i*COLUMNS + j
+                    if not self.disks[index]:
+                        self.disks[index] = Disk(i, j, player)
                     else:
-                        self.disks[i * j].set_pos(i, j)
-                        self.disks[i * j].set_color(player)
+                        self.disks[index].set_pos(i, j)
+                        self.disks[index].set_color(player)
 
     def make_grid_and_buttons(self):
         for i in range(ROWS + 1):
