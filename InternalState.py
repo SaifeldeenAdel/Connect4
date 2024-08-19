@@ -25,25 +25,24 @@ class InternalState:
         nparray = np.zeros((ROWS, COLUMNS), dtype=np.int8)
         # print(nparray)
 
-
         for col in range(COLUMNS):
-            #print(f"column {col}")
+            # print(f"column {col}")
             start = col * COLUMN_BITS
             end = start + COLUMN_BITS
-            #print(f"start {start} and end {end}")
+            # print(f"start {start} and end {end}")
             column_representation = binary_state[start: end]
-            #print(f"column representation {column_representation}")
+            # print(f"column representation {column_representation}")
             num_rows_occupied = int(column_representation[:ROW_BITS], 2)
-            #print(f"num_rows_occupied {num_rows_occupied}")
+            # print(f"num_rows_occupied {num_rows_occupied}")
 
             disks = column_representation[ROW_BITS: ROW_BITS + num_rows_occupied]
-            #print(f"disks {disks}")
+            # print(f"disks {disks}")
             i = 0
             start_row = ROWS - 1
             end_row = start_row - num_rows_occupied
             for row in range(start_row, end_row, -1):  # 0,0 is top left, we start bottom left
                 #                   RED                     Yellow
-                nparray[row, col] = 1 if disks[i] == '1' else 2
+                nparray[row, col] = 1 if disks[i] == '0' else 2
                 i += 1
         return nparray
 
@@ -55,4 +54,4 @@ decimal_number = int(binary_string.replace(" ", ""), 2)
 b = InternalState(decimal_number)
 print(decimal_number)
 print(b.get_numpy_format())
-#print(b.get_numpy_format())
+# print(b.get_numpy_format())

@@ -27,6 +27,7 @@ class BoardState:
         return columns_available
 
     def insert(self, col: int, player: int) -> 'BoardState':
+        print(self.get_possible_moves())
         if col in self.get_possible_moves():
             column_representation, start, end = self.get_column_representation(col)
             # -----------
@@ -37,7 +38,10 @@ class BoardState:
             disks = column_representation[-ROWS:]
             # print(f"olddisks: {disks}")
             #  inserting the new disk
-            new_disks = self.replace_character_in_string(disks, num_rows_occupied, str(self.get_player_binary(player)))
+            print(f"player in insert {player}")
+            new_disks = self.replace_character_in_string(disks, num_rows_occupied - 1,
+                                                         str(self.get_player_binary(player)))
+
             # print(f"newdisks: {new_disks}")
             new_column_representation = new_rows_string + new_disks
             # print(f"newcol {new_column_representation}")
@@ -47,6 +51,7 @@ class BoardState:
             decimal = int(new_binary_state, 2)
             return BoardState(InternalState(decimal))
         print(f"ERROR CAN NOT INSERT IN COLUMN {col}")
+        return self
 
     def get_new_binary_state(self, start: int, new_col_representation: str, end: int) -> str:
         binary_state = self.state.get_binary_state()
@@ -63,7 +68,12 @@ class BoardState:
     def replace_character_in_string(self, original_string: str, index: int, new_char: str) -> str:
         return original_string[:index] + new_char + original_string[index + 1:]
 
-    def get_player_binary(self, player: int):  # plater 1 is red and else is 2 which is yellow
+    def get_player_binary(self, player: int):  # player 1 is red and else is 2 which is yellow
+        #  0 in array -> EMPTY
+        #  1 in array -> player 1 -> RED
+        #  2 in array -> player 2 -> YELLOW
+        #  BINARY 0 -> RED
+        #  BINARY 1 -> YELLOW
         return 0 if player == 1 else 1
 
     def increment_binary(self, num: str) -> str:
@@ -126,40 +136,15 @@ class BoardState:
     def __repr__(self) -> str:
         return str(self.state)
 
-
 # binary_string = '010 000000 100 000001 001 000001 100 001110 011 000001 001 000001 000 000000'
-binary_string = '010 000000 100 000100 001 100000 100 111000 011 001000 001 100000 000 000000'
-binary_string2 = '010 000000 101 010100 001 100000 100 111000 011 001000 001 100000 000 000000'
+# binary_string = '010 000000 100 000100 001 100000 100 111000 011 001000 001 100000 000 000000'
+# binary_string2 = '010 000000 101 010100 001 100000 100 111000 011 001000 001 100000 000 000000'
 #              '010 000000 100 000100 001 100000 100 111000 011 001000 101 010000 000 00000'
 #               '010 000000 100 000100 001 100000 100 111000 011 001000 101 01000000000000'
-decimal_number = int(binary_string.replace(" ", ""), 2)
+# decimal_number = int(binary_string.replace(" ", ""), 2)
 
-b = InternalState(decimal_number)
+# b = InternalState(decimal_number)
 
-bs = BoardState(b)
+# bs = BoardState(b)
 # print("MAIN ")
 # print(bs.state.get_numpy_format())
-
-
-l = bs.get_neighbors(2)
-for s in l:
-    print('smth')
-    print(s.state.get_numpy_format())
-
-# print("BEFORE")
-# print(bs.state.get_numpy_format())
-
-# new_board = bs.insert(1, 2)
-
-# print("AFTER INSERTION")
-# print(new_board.state.get_numpy_format())
-
-# new_board2 = bs.insert(5, 2)
-
-# print("AFTER INSERTION2")
-# print(new_board2.state.get_numpy_format())
-
-# new_board3 = bs.insert(6, 2)
-
-# print("AFTER INSERTION3")
-# print(new_board3.state.get_numpy_format())

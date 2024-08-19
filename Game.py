@@ -16,14 +16,15 @@ class Game:
     def __init__(self) -> None:
         pygame.init()
         self.playing = False
-        self.player = HUMAN  #if random.random() >= 0.5 else AI
+        self.player = HUMAN  # if random.random() >= 0.5 else AI
+
         self.human = 1 if self.player == HUMAN else 2
         self.ai = 1 if self.player == AI else 2
+
         self.mode = None
         self.tree = Tree()
 
         self.disks = [0 for _ in range(42)]  # Pool of disks to use
-        
 
         self.current_state = BoardState(InternalState(INITIAL_STATE))
 
@@ -35,7 +36,6 @@ class Game:
         # self.current_state = self.current_state.insert(1, self.human)
         # self.current_state = self.current_state.insert(1, self.human)
         print(self.current_state.state.get_numpy_format())
-
 
         # self.K = input("Enter K (max depth of tree): ")
 
@@ -96,7 +96,7 @@ class Game:
         for i, row in enumerate(self.current_state.state.get_numpy_format()):
             for j, player in enumerate(row):
                 if player:
-                    index = i*COLUMNS + j
+                    index = i * COLUMNS + j
                     if not self.disks[index]:
                         self.disks[index] = Disk(i, j, player)
                     else:
@@ -133,12 +133,11 @@ class Game:
         return rect
 
     def handle_human_move(self, col):
-      self.current_state = self.current_state.insert(col, self.human)
-      print(self.current_state.state.get_numpy_format())
-      # self.player = AI  # Switch to AI after the human move
-        
+        print(f"col: {col} || human: {self.human}")
+        self.current_state = self.current_state.insert(col, self.human)
+        print(self.current_state.state.get_numpy_format())
+        print(self.current_state.state.get_binary_state())
+        # self.player = AI  # Switch to AI after the human move
 
     def game_end(self):
-      return not np.any(self.current_state == 0)
-
-  
+        return not np.any(self.current_state == 0)
