@@ -1,5 +1,5 @@
 import numpy as np
-from constants import EMPTY, HUMAN, AI, COLUMNS, ROWS, NUM_BITS_PER_COLUMN
+from constants import EMPTY, HUMAN, AI, COLUMNS, ROWS, COLUMN_BITS, ROW_BITS
 from InternalState import InternalState
 
 
@@ -16,51 +16,49 @@ class BoardState:
         #  BINARY 0 -> RED
         #  BINARY 1 -> YELLOW
         columns_available = []
-        binary_state = self.state.get_binary_state()
-        num_occupied = NUM_BITS_PER_COLUMN - ROWS
 
         for col in range(COLUMNS):
-            start = col * NUM_BITS_PER_COLUMN
-            end = start + NUM_BITS_PER_COLUMN
+            column_representation, _, _ = self.get_column_representation(col)
 
-            column_representation = binary_state[start: end]
-
-            num_rows_occupied = int(column_representation[:num_occupied], 2)
+            num_rows_occupied = int(column_representation[:ROW_BITS], 2)
 
             if num_rows_occupied < ROWS:
                 columns_available.append(col)
         return columns_available
 
-    # Returns a list of columns that have empty rows left
-    # def get_possible_moves(self) -> list[int]:
-    #    possible_moves = []
-    #    for col in range(COLUMNS):
-    #        if self.state[0, col] == EMPTY:  # Check if the top cell of the column is empty
-    #            possible_moves.append(col)
-    #    return possible_moves
-
     def insert(self, col: int, player: int) -> 'BoardState':
         if col in self.get_possible_moves():
-            binary_state = self.state.get_binary_state()
-            num_occupied = NUM_BITS_PER_COLUMN - ROWS
+            column_representation, start, end = self.get_column_representation(col)
+            # -----------
 
-            start = col * NUM_BITS_PER_COLUMN
-            end = start + NUM_BITS_PER_COLUMN
-
-            column_representation = binary_state[start: end]
-            new_rows_string = self.increment_binary(column_representation[:num_occupied]) # numrows occupied
-            num_rows_occupied = int(new_rows_string,2)
+            new_rows_string = self.increment_binary(column_representation[:ROW_BITS])
+            num_rows_occupied = int(new_rows_string, 2)
+            #  to get the disks, it is the last "ROWS" bit from the column representation
             disks = column_representation[-ROWS:]
-            #print(f"olddisks: {disks}")
+            # print(f"olddisks: {disks}")
+            #  inserting the new disk
             new_disks = self.replace_character_in_string(disks, num_rows_occupied, str(self.get_player_binary(player)))
-            #print(f"newdisks: {new_disks}")
+            # print(f"newdisks: {new_disks}")
             new_column_representation = new_rows_string + new_disks
-            #print(f"newcol {new_column_representation}")
-            new_binary_representation = binary_state[:start] + new_column_representation + binary_state[end:]
-            #print(f"newbinaryrep {new_binary_representation}")
-            decimal = int(new_binary_representation, 2)
+            # print(f"newcol {new_column_representation}")
+
+            new_binary_state = self.get_new_binary_state(start, new_column_representation, end)
+            # print(f"newbinaryrep {new_binary_representation}")
+            decimal = int(new_binary_state, 2)
             return BoardState(InternalState(decimal))
         print(f"ERROR CAN NOT INSERT IN COLUMN {col}")
+
+    def get_new_binary_state(self, start: int, new_col_representation: str, end: int) -> str:
+        binary_state = self.state.get_binary_state()
+        return binary_state[:start] + new_col_representation + binary_state[end:]
+
+    def get_column_representation(self, col: int) -> (str, int, int):
+        binary_state = self.state.get_binary_state()
+
+        start = col * COLUMN_BITS
+        end = start + COLUMN_BITS
+
+        return binary_state[start: end], start, end,
 
     def replace_character_in_string(self, original_string: str, index: int, new_char: str) -> str:
         return original_string[:index] + new_char + original_string[index + 1:]
@@ -68,7 +66,7 @@ class BoardState:
     def get_player_binary(self, player: int):  # plater 1 is red and else is 2 which is yellow
         return 0 if player == 1 else 1
 
-    def increment_binary(self,num: str)-> str:
+    def increment_binary(self, num: str) -> str:
         decimal_num = int(num, 2)
         decimal_num += 1
         binary_state = bin(decimal_num)[2:]
@@ -131,8 +129,8 @@ class BoardState:
 
 # binary_string = '010 000000 100 000001 001 000001 100 001110 011 000001 001 000001 000 000000'
 binary_string = '010 000000 100 000100 001 100000 100 111000 011 001000 001 100000 000 000000'
-binary_string2 ='010 000000 101 010100 001 100000 100 111000 011 001000 001 100000 000 000000'
- #              '010 000000 100 000100 001 100000 100 111000 011 001000 101 010000 000 00000'
+binary_string2 = '010 000000 101 010100 001 100000 100 111000 011 001000 001 100000 000 000000'
+#              '010 000000 100 000100 001 100000 100 111000 011 001000 101 010000 000 00000'
 #               '010 000000 100 000100 001 100000 100 111000 011 001000 101 01000000000000'
 decimal_number = int(binary_string.replace(" ", ""), 2)
 
@@ -148,20 +146,20 @@ for s in l:
     print('smth')
     print(s.state.get_numpy_format())
 
-#print("BEFORE")
-#print(bs.state.get_numpy_format())
+# print("BEFORE")
+# print(bs.state.get_numpy_format())
 
-#new_board = bs.insert(1, 2)
+# new_board = bs.insert(1, 2)
 
-#print("AFTER INSERTION")
-#print(new_board.state.get_numpy_format())
+# print("AFTER INSERTION")
+# print(new_board.state.get_numpy_format())
 
-#new_board2 = bs.insert(5, 2)
+# new_board2 = bs.insert(5, 2)
 
-#print("AFTER INSERTION2")
-#print(new_board2.state.get_numpy_format())
+# print("AFTER INSERTION2")
+# print(new_board2.state.get_numpy_format())
 
-#new_board3 = bs.insert(6, 2)
+# new_board3 = bs.insert(6, 2)
 
-#print("AFTER INSERTION3")
-#print(new_board3.state.get_numpy_format())
+# print("AFTER INSERTION3")
+# print(new_board3.state.get_numpy_format())

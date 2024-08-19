@@ -3,11 +3,10 @@ ROWS = 6
 COLUMNS = 7
 INITIAL_STATE = int('000 000000 000 000000 000 000000 000 000000 000 000000 000 000000 000 000000'.replace(" ", ""), 2)
 
-BITS_FOR_COLS = len(bin(ROWS)[2:])
-NUM_BITS_PER_COLUMN = BITS_FOR_COLS + ROWS
-MAX_BITS_PER_STATE = NUM_BITS_PER_COLUMN * COLUMNS
-print(NUM_BITS_PER_COLUMN)
-print(MAX_BITS_PER_STATE)
+ROW_BITS = len(bin(ROWS)[2:])  # row_bits are the number of bis needed to tell how many rows are occupied
+COLUMN_BITS = ROW_BITS + ROWS  # column_bits are the number of bits needed to make the column_representation
+STATE_BITS = COLUMN_BITS * COLUMNS  # state_bits are the number of bits needed to represent a state in binary
+
 CELL_SIZE = 120
 
 MINIMAX = "Minimax"

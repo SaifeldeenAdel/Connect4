@@ -1,4 +1,4 @@
-from constants import MAX_BITS_PER_STATE, COLUMNS, ROWS, NUM_BITS_PER_COLUMN, BITS_FOR_COLS
+from constants import STATE_BITS, COLUMNS, ROWS, COLUMN_BITS, ROW_BITS
 import numpy as np
 
 
@@ -9,7 +9,7 @@ class InternalState:
 
     def get_binary_state(self) -> str:
         binary_state = bin(self.__decimal_state)[2:]
-        binary_state = '0' * (MAX_BITS_PER_STATE - len(binary_state)) + binary_state
+        binary_state = '0' * (STATE_BITS - len(binary_state)) + binary_state
         return binary_state
 
     def get_decimal_state(self) -> int:
@@ -28,15 +28,15 @@ class InternalState:
 
         for col in range(COLUMNS):
             #print(f"column {col}")
-            start = col * NUM_BITS_PER_COLUMN
-            end = start + NUM_BITS_PER_COLUMN
+            start = col * COLUMN_BITS
+            end = start + COLUMN_BITS
             #print(f"start {start} and end {end}")
             column_representation = binary_state[start: end]
             #print(f"column representation {column_representation}")
-            num_rows_occupied = int(column_representation[:BITS_FOR_COLS], 2)
+            num_rows_occupied = int(column_representation[:ROW_BITS], 2)
             #print(f"num_rows_occupied {num_rows_occupied}")
 
-            disks = column_representation[BITS_FOR_COLS: BITS_FOR_COLS + num_rows_occupied]
+            disks = column_representation[ROW_BITS: ROW_BITS + num_rows_occupied]
             #print(f"disks {disks}")
             i = 0
             start_row = ROWS - 1
