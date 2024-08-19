@@ -3,11 +3,12 @@ import numpy as np
 import random
 from treelib import Tree
 from BoardState import BoardState
+from InternalState import InternalState
 from Disk import Disk
 from Minimax import Minimax
 
 from constants import EMPTY, HUMAN, AI
-from constants import WIDTH, HEIGHT, COLUMNS, ROWS, CELL_SIZE
+from constants import WIDTH, HEIGHT, COLUMNS, ROWS, CELL_SIZE, INITIAL_STATE
 from constants import MINIMAX, MINIMAX_PRUNE, EXPECTI
 
 
@@ -15,12 +16,15 @@ class Game:
     def __init__(self) -> None:
         pygame.init()
         self.playing = False
-        self.player = HUMAN if random.random() >= 0.5 else AI
+        self.player = HUMAN  #if random.random() >= 0.5 else AI
+        self.human = 1 if self.player == HUMAN else 2
+        self.ai = 1 if self.player == AI else 2
         self.mode = None
         self.tree = Tree()
 
         self.disks = [0 for _ in range(42)]  # Pool of disks to use
-        self.current_state = BoardState(np.zeros((8, 8), dtype=np.int8))
+
+        self.current_state = BoardState(InternalState(INITIAL_STATE))
 
         # self.K = input("Enter K (max depth of tree): ")
 
@@ -78,7 +82,7 @@ class Game:
 
     # Creates new disk objects if need or updates existing objects
     def set_disks(self):
-        for i, row in enumerate(self.current_state.state):
+        for i, row in enumerate(self.current_state.state.get_numpy_format()):
             for j, player in enumerate(row):
                 if player:
                     if not self.disks[i * j]:
@@ -117,12 +121,8 @@ class Game:
         return rect
 
     def handle_human_move(self, col):
-        self.current_state = self.current_state.insert(col, HUMAN)
-        # self.player = AI  # Switch to AI after the human move
-
-    def handle_human_move(self, col):
-      self.current_state = self.current_state.insert(col, HUMAN)
-      
+      self.current_state = self.current_state.insert(col, self.human)
+      print(self.current_state.state.get_numpy_format())
       # self.player = AI  # Switch to AI after the human move
         
 

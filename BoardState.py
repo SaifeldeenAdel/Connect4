@@ -139,8 +139,8 @@ decimal_number = int(binary_string.replace(" ", ""), 2)
 b = InternalState(decimal_number)
 
 bs = BoardState(b)
-print("MAIN ")
-print(bs.state.get_numpy_format())
+# print("MAIN ")
+# print(bs.state.get_numpy_format())
 
 
 l = bs.get_neighbors(2)
