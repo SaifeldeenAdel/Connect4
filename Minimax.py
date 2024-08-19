@@ -5,10 +5,11 @@ import math
 class Minimax:
   def __init__(self, mode) -> None:
     self.mode = mode
-    
+
     self.alpha = None
     self.beta = None
 
+  
   def run(self, state : GameState, depth, player):
     neighbors = state.get_neighbors(player) 
 

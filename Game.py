@@ -2,8 +2,10 @@ import pygame
 import numpy as np
 import random
 from treelib import Tree
+
 from GameState import GameState
 from Disk import Disk
+from Minimax import Minimax
 
 from constants import EMPTY, HUMAN, AI
 from constants import WIDTH, HEIGHT, COLUMNS, ROWS, CELL_SIZE
@@ -20,7 +22,7 @@ class Game:
     self.disks = [0 for _ in range(42)] # Pool of disks to use
     self.current_state = GameState(np.zeros((8,8), dtype=np.int8), id=0)
 
-    # self.K = input("Enter K (max depth of tree): ")
+    self.K = 1 # input("Enter K (max depth of tree): ")
 
     self.initialiseBoard()
 
@@ -70,6 +72,7 @@ class Game:
         disk.draw(self.surface)
 
     if self.player == AI and self.mode:
+      Minimax.get_instance().run(self.K)
       print("Running algo")
 
     pygame.display.update()
@@ -118,6 +121,7 @@ class Game:
 
   def handle_human_move(self, col):
     self.current_state = self.current_state.insert(col, HUMAN)
+    
     # self.player = AI  # Switch to AI after the human move
       
 
