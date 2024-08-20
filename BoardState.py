@@ -37,6 +37,7 @@ class BoardState:
             disks = column_representation[-ROWS:]
             # print(f"olddisks: {disks}")
             #  inserting the new disk
+            print(f"player in insert {player}")
             new_disks = self.replace_character_in_string(disks, num_rows_occupied - 1,
                                                         str(self.get_player_binary(player)))
 

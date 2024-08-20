@@ -48,7 +48,7 @@ class InternalState:
 
 
 # # binary_string = '010 000000 100 000001 001 000001 100 001110 011 000001 001 000001 000 000000'
-# binary_string = '000 000000 000 000000 000 000000 000 000000 000 000000 000 000000 000 000000'
+# binary_string = '100 100000 000 000000 000 000000 000 000000 000 000000 000 000000 000 000000'
 # decimal_number = int(binary_string.replace(" ", ""), 2)
 
 # b = InternalState(decimal_number)

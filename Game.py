@@ -16,8 +16,8 @@ class Game:
     def __init__(self) -> None:
         pygame.init()
         self.playing = False
-        self.player = HUMAN  # if random.random() >= 0.5 else AI
-
+        self.player = HUMAN if random.random() >= 0.5 else AI
+        self.player1 = True
         self.human = 1 if self.player == HUMAN else 2
         self.ai = 1 if self.player == AI else 2
 
@@ -28,15 +28,6 @@ class Game:
         self.disks = [0 for _ in range(42)]  # Pool of disks to use
 
         self.current_state = BoardState(InternalState(INITIAL_STATE))
-        
-
-        # self.current_state = self.current_state.insert(1, self.human)
-        # self.current_state = self.current_state.insert(1, self.human)
-        # self.current_state = self.current_state.insert(1, self.human)
-        # self.current_state = self.current_state.insert(1, self.human)
-        # self.current_state = self.current_state.insert(1, self.human)
-        # self.current_state = self.current_state.insert(1, self.human)
-        # self.current_state = self.current_state.insert(1, self.human)
 
         self.K = 3 #int(input("Enter K (max depth of tree): "))
 
@@ -120,7 +111,7 @@ class Game:
 
     def update_text(self):
         self.font = pygame.font.Font(None, 33)
-        color = (255, 0, 0) if self.player == HUMAN else (180, 140, 0)
+        color = (255, 0, 0) if self.player1 else (180, 140, 0)
         player_text = self.font.render(f"Player: {'HUMAN' if self.player is HUMAN else 'AI'}", True, color)
         mode = self.font.render(f"Mode: {self.mode}", True, (0, 0, 0))
         self.surface.blit(player_text, (WIDTH + 20, 100))
@@ -137,11 +128,15 @@ class Game:
 
     def handle_human_move(self, col):
         self.current_state = self.current_state.insert(col, self.human)
-        print(self.current_state.is_terminal())
-        self.player = AI  # Switch to AI after the human move
+        print(self.current_state.state.get_numpy_format())
+        self.player = AI 
+        self.player1 = not self.player1 # Switch to AI after the human move
 
     def handle_ai_move(self, col):
+        
         self.current_state = self.current_state.insert(col, self.ai)
+        print(self.current_state.state.get_numpy_format())
+        self.player1 = not self.player1 # Switch to AI after the human move
         self.player = HUMAN  # Switch to AI after the human move
     
 

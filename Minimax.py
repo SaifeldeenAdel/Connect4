@@ -11,10 +11,10 @@ class Minimax:
     self.beta = None
 
   def run(self, state : BoardState, depth, player):
-    print(state)
+    # print(state)
     neighbors = state.get_neighbors(player) 
     cols = [neighbor[0] for neighbor in neighbors]
-    print("Running minimax")
+    # print("Running minimax")
     if state.is_terminal() or depth == 0:
       if state.is_terminal():
         return (None, state.get_score(player))
