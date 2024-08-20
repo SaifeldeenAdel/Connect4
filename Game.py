@@ -64,7 +64,7 @@ class Game:
                     self.mode = EXPECTI
                 else:
                     # Handle human move
-                    if self.player == HUMAN:
+                    if self.player == HUMAN and not self.game_end():
                         col = event.pos[0] // CELL_SIZE  # Determine the clicked column
                         self.handle_human_move(col)
 
@@ -79,7 +79,7 @@ class Game:
             if disk:
                 disk.draw(self.surface)
 
-        if self.player == AI and self.mode:
+        if self.player == AI and self.mode and not self.game_end():
             col, score = self.minimax.run(self.current_state, self.K, self.ai)
             self.handle_ai_move(col)
             print(score)
@@ -115,8 +115,10 @@ class Game:
         color = (255, 0, 0) if self.player1 else (180, 140, 0)
         player_text = self.font.render(f"Player: {'HUMAN' if self.player is HUMAN else 'AI'}", True, color)
         mode = self.font.render(f"Mode: {self.mode}", True, (0, 0, 0))
+        over = self.font.render(f"{'GAME OVER' if self.game_end() else ''}", True, (0, 0, 0))
         self.surface.blit(player_text, (WIDTH + 20, 100))
         self.surface.blit(mode, (WIDTH + 20, 600))
+        self.surface.blit(over, (WIDTH + 20, 650))
 
     def make_button(self, text, x, y, width, height):
         rect = pygame.Rect(x, y, width, height)
@@ -135,7 +137,6 @@ class Game:
           self.player1 = not self.player1 # Switch to AI after the human move
 
     def handle_ai_move(self, col):
-        
         self.current_state, ret = self.current_state.insert(col, self.ai)
         if ret:
           print(self.current_state.state.get_numpy_format())
@@ -143,4 +144,4 @@ class Game:
           self.player = HUMAN  # Switch to AI after the human move
 
     def game_end(self):
-        return not np.any(self.current_state == 0)
+        return self.current_state.is_terminal()

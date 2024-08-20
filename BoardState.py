@@ -1,5 +1,5 @@
 import numpy as np
-from constants import EMPTY, HUMAN, AI, COLUMNS, ROWS, COLUMN_BITS, ROW_BITS
+from constants import EMPTY, HUMAN, AI, COLUMNS, ROWS, COLUMN_BITS, ROW_BITS, FOURS_BIAS, THREES_BIAS
 from InternalState import InternalState
 
 
@@ -96,12 +96,13 @@ class BoardState:
     def is_terminal(self):
         return all(self.state.get_binary_state()[i:i+3] == '110' for i in range(0, len(self.state.get_binary_state()), 9))
 
-    def get_heuristic(self, player):
-        return 20 if player == AI else -20 
+    def get_heuristic(self, maximizer, minimizer):
+        threes = self.__getConnected3s(maximizer) - self.__getConnected3s(minimizer)
+        fours = self.__getConnected4s(maximizer) - self.__getConnected4s(minimizer)
+        return FOURS_BIAS * fours + THREES_BIAS * threes
     
-    def get_score(self, player):
-        return 100 if player == AI else -100
-        # return self.__getConnected4s(player) - self.__getConnected4s(opposing)
+    def get_score(self, maximizer, minimizer):
+        return self.__getConnected4s(maximizer) - self.__getConnected4s(minimizer)
 
     def __getConnected4s(self, player):
         count = 0

@@ -1,4 +1,4 @@
-from constants import AI, HUMAN
+from constants import AI, HUMAN, SCORE_BIAS
 from BoardState import BoardState
 import math
 import random
@@ -7,6 +7,7 @@ class Minimax:
   def __init__(self, mode, maximizer) -> None:
     self.mode = mode
     self.maximizer = maximizer
+    self.minimizer = 1 if maximizer == 2 else 2
 
     self.alpha = None
     self.beta = None 
@@ -18,9 +19,9 @@ class Minimax:
     # print("Running minimax")
     if state.is_terminal() or depth == 0:
       if state.is_terminal():
-        return (None, state.get_score(player))
+        return (None, state.get_score(self.maximizer, self.minimizer) * SCORE_BIAS)
       elif depth == 0:
-        return (None, state.get_heuristic(player))
+        return (None, state.get_heuristic(self.maximizer, self.minimizer))
     
     if player == self.maximizer: # Maximizer
       value = -math.inf
