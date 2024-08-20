@@ -4,11 +4,12 @@ import math
 import random
 
 class Minimax:
-  def __init__(self, mode) -> None:
+  def __init__(self, mode, maximizer) -> None:
     self.mode = mode
+    self.maximizer = maximizer
 
     self.alpha = None
-    self.beta = None
+    self.beta = None 
 
   def run(self, state : BoardState, depth, player):
     # print(state)
@@ -21,7 +22,7 @@ class Minimax:
       elif depth == 0:
         return (None, state.get_heuristic(player))
     
-    if player == AI: # Maximizer
+    if player == self.maximizer: # Maximizer
       value = -math.inf
       column = random.choice(cols)
       for col, neighbor in neighbors:
@@ -31,7 +32,7 @@ class Minimax:
           column = col
       return (column, value)
       
-    elif player == HUMAN: ## Minimizer
+    else: ## Minimizer
       value = math.inf
       column = random.choice(cols)
       for col, neighbor in neighbors:

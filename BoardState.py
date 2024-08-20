@@ -37,7 +37,7 @@ class BoardState:
             disks = column_representation[-ROWS:]
             # print(f"olddisks: {disks}")
             #  inserting the new disk
-            print(f"player in insert {player}")
+            # print(f"player in insert {player}")
             new_disks = self.replace_character_in_string(disks, num_rows_occupied - 1,
                                                         str(self.get_player_binary(player)))
 
@@ -48,9 +48,9 @@ class BoardState:
             new_binary_state = self.get_new_binary_state(start, new_column_representation, end)
             # print(f"newbinaryrep {new_binary_representation}")
             decimal = int(new_binary_state, 2)
-            return BoardState(InternalState(decimal))
+            return BoardState(InternalState(decimal)), True
         print(f"ERROR CAN NOT INSERT IN COLUMN {col}")
-        return self
+        return self, False
 
     def get_new_binary_state(self, start: int, new_col_representation: str, end: int) -> str:
         binary_state = self.state.get_binary_state()
@@ -88,7 +88,7 @@ class BoardState:
         opposing = 1 if player == 2 else 2
 
         for col in possible_moves:
-            next_state = self.insert(col, opposing)
+            next_state, _ = self.insert(col, opposing)
             neighbors.append((col, next_state))
 
         return neighbors

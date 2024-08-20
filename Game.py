@@ -54,7 +54,7 @@ class Game:
                 if self.minimax_btn.collidepoint(event.pos):
                     
                     self.mode = MINIMAX
-                    self.minimax = Minimax(self.mode)
+                    self.minimax = Minimax(self.mode, self.ai)
                     # self.player = HUMAN if self.player == AI else AI
 
                 elif self.pruning_btn.collidepoint(event.pos):
@@ -80,8 +80,9 @@ class Game:
                 disk.draw(self.surface)
 
         if self.player == AI and self.mode:
-            col, score = self.minimax.run(self.current_state, self.K, AI)
+            col, score = self.minimax.run(self.current_state, self.K, self.ai)
             self.handle_ai_move(col)
+            print(score)
 
         pygame.display.update()
 
@@ -127,19 +128,19 @@ class Game:
         return rect
 
     def handle_human_move(self, col):
-        self.current_state = self.current_state.insert(col, self.human)
-        print(self.current_state.state.get_numpy_format())
-        self.player = AI 
-        self.player1 = not self.player1 # Switch to AI after the human move
+        self.current_state, ret = self.current_state.insert(col, self.human)
+        if ret:
+          print(self.current_state.state.get_numpy_format())
+          self.player = AI 
+          self.player1 = not self.player1 # Switch to AI after the human move
 
     def handle_ai_move(self, col):
         
-        self.current_state = self.current_state.insert(col, self.ai)
-        print(self.current_state.state.get_numpy_format())
-        self.player1 = not self.player1 # Switch to AI after the human move
-        self.player = HUMAN  # Switch to AI after the human move
-    
-
+        self.current_state, ret = self.current_state.insert(col, self.ai)
+        if ret:
+          print(self.current_state.state.get_numpy_format())
+          self.player1 = not self.player1 # Switch to AI after the human move
+          self.player = HUMAN  # Switch to AI after the human move
 
     def game_end(self):
         return not np.any(self.current_state == 0)
