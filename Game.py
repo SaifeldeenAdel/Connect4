@@ -22,11 +22,13 @@ class Game:
         self.ai = 1 if self.player == AI else 2
 
         self.mode = None
+        self.minimax = None
         self.tree = Tree()
 
         self.disks = [0 for _ in range(42)]  # Pool of disks to use
 
         self.current_state = BoardState(InternalState(INITIAL_STATE))
+        
 
         # self.current_state = self.current_state.insert(1, self.human)
         # self.current_state = self.current_state.insert(1, self.human)
@@ -35,9 +37,8 @@ class Game:
         # self.current_state = self.current_state.insert(1, self.human)
         # self.current_state = self.current_state.insert(1, self.human)
         # self.current_state = self.current_state.insert(1, self.human)
-        print(self.current_state.state.get_numpy_format())
 
-        # self.K = input("Enter K (max depth of tree): ")
+        self.K = 3 #int(input("Enter K (max depth of tree): "))
 
         self.initialiseBoard()
 
@@ -60,7 +61,9 @@ class Game:
                 quit(0)
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if self.minimax_btn.collidepoint(event.pos):
+                    
                     self.mode = MINIMAX
+                    self.minimax = Minimax(self.mode)
                     # self.player = HUMAN if self.player == AI else AI
 
                 elif self.pruning_btn.collidepoint(event.pos):
@@ -86,8 +89,8 @@ class Game:
                 disk.draw(self.surface)
 
         if self.player == AI and self.mode:
-            Minimax.get_instance().run(self.K)
-            print("Running algo")
+            col, score = self.minimax.run(self.current_state, self.K, AI)
+            self.handle_ai_move(col)
 
         pygame.display.update()
 
@@ -133,11 +136,15 @@ class Game:
         return rect
 
     def handle_human_move(self, col):
-        print(f"col: {col} || human: {self.human}")
         self.current_state = self.current_state.insert(col, self.human)
-        print(self.current_state.state.get_numpy_format())
-        print(self.current_state.state.get_binary_state())
-        # self.player = AI  # Switch to AI after the human move
+        print(self.current_state.is_terminal())
+        self.player = AI  # Switch to AI after the human move
+
+    def handle_ai_move(self, col):
+        self.current_state = self.current_state.insert(col, self.ai)
+        self.player = HUMAN  # Switch to AI after the human move
+    
+
 
     def game_end(self):
         return not np.any(self.current_state == 0)

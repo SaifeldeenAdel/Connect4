@@ -27,7 +27,6 @@ class BoardState:
         return columns_available
 
     def insert(self, col: int, player: int) -> 'BoardState':
-        print(self.get_possible_moves())
         if col in self.get_possible_moves():
             column_representation, start, end = self.get_column_representation(col)
             # -----------
@@ -38,9 +37,8 @@ class BoardState:
             disks = column_representation[-ROWS:]
             # print(f"olddisks: {disks}")
             #  inserting the new disk
-            print(f"player in insert {player}")
             new_disks = self.replace_character_in_string(disks, num_rows_occupied - 1,
-                                                         str(self.get_player_binary(player)))
+                                                        str(self.get_player_binary(player)))
 
             # print(f"newdisks: {new_disks}")
             new_column_representation = new_rows_string + new_disks
@@ -63,7 +61,7 @@ class BoardState:
         start = col * COLUMN_BITS
         end = start + COLUMN_BITS
 
-        return binary_state[start: end], start, end,
+        return binary_state[start: end], start, end
 
     def replace_character_in_string(self, original_string: str, index: int, new_char: str) -> str:
         return original_string[:index] + new_char + original_string[index + 1:]
@@ -86,18 +84,23 @@ class BoardState:
     def get_neighbors(self, player: int):
         neighbors = []
         possible_moves = self.get_possible_moves()
+        opposing = 1 if player == 2 else 2
 
         for col in possible_moves:
-            next_state = self.insert(col, player)
-            neighbors.append(next_state)
+            next_state = self.insert(col, opposing)
+            neighbors.append((col, next_state))
 
         return neighbors
 
-    def is_terminal(self, player):
-        return not np.any(self.state == 0)
+    def is_terminal(self):
+        return all(self.state.get_binary_state()[i:i+3] == '110' for i in range(0, len(self.state.get_binary_state()), 9))
 
     def get_heuristic(self, player):
-        pass
+        return 20 if player == AI else -20 
+    
+    def get_score(self, player):
+        return 100 if player == AI else -100
+        # return self.__getConnected4s(player) - self.__getConnected4s(opposing)
 
     def __getConnected4s(self, player):
         count = 0
