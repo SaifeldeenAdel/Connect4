@@ -8,7 +8,7 @@ class Minimax:
     self.mode = mode
     self.maximizer = maximizer
     self.minimizer = 1 if maximizer == 2 else 2
-
+    
     self.alpha = None
     self.beta = None 
 
@@ -25,7 +25,7 @@ class Minimax:
     
     if player == self.maximizer: # Maximizer
       value = -math.inf
-      column = random.choice(cols)
+      column = None
       for col, neighbor in neighbors:
         new_score = self.run(neighbor, depth-1, self.minimizer)[1]
         if new_score > value:
@@ -35,7 +35,7 @@ class Minimax:
       
     else: ## Minimizer
       value = math.inf
-      column = random.choice(cols)
+      column = None
       for col, neighbor in neighbors:
         new_score = self.run(neighbor, depth-1, self.maximizer)[1]
         if new_score < value:
