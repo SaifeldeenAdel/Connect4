@@ -64,3 +64,39 @@ class A_B_pruning:
                 break
         self.nodes.append((state.get_id(), value, depth))
         return (column, value)
+    def draw_tree(self):
+      nodes = list(reversed(self.nodes))
+      tree = Tree()
+  
+      parent_ids = [(nodes[0][0],nodes[0][2])]
+      tree.create_node(nodes[0][1], nodes[0][0])
+  
+      for id, value, depth in nodes[1:]:
+        if depth < parent_ids[-1][1]:
+          tree.create_node(value, id, parent=parent_ids[-1][0])
+          parent_ids.append((id, depth))
+        elif depth == parent_ids[-1][1]:
+  
+          tree.create_node(value, id, parent=parent_ids[-2][0])
+        elif depth > parent_ids[-1][1]:
+          while parent_ids and parent_ids[-1][1] <= depth:
+            parent_ids.pop()
+  
+          tree.create_node(value, id, parent=parent_ids[-1][0])
+          parent_ids.append((id, depth))
+      
+      print(tree.show(stdout=False))
+      self.tree = tree
+      
+        
+    def reset_nodes(self):
+      self.nodes = []
+  
+    def tree_svg(self):
+      self.tree.to_graphviz("minimax.dot")
+      dot = pd.graph_from_dot_file("minimax.dot")
+      filename = "minimax.svg"
+      dot.write_svg(filename)
+  
+  
+  

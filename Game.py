@@ -6,6 +6,7 @@ from BoardState import BoardState
 from InternalState import InternalState
 from Disk import Disk
 from Minimax import Minimax
+from A_B_pruning import A_B_pruning
 
 from constants import EMPTY, HUMAN, AI
 from constants import WIDTH, HEIGHT, COLUMNS, ROWS, CELL_SIZE, INITIAL_STATE
@@ -59,6 +60,7 @@ class Game:
 
                 elif self.pruning_btn.collidepoint(event.pos):
                     self.mode = MINIMAX_PRUNE
+                    self.minimax = A_B_pruning(self.mode, self.K, self.ai)
 
                 elif self.expecti_btn.collidepoint(event.pos):
                     self.mode = EXPECTI
