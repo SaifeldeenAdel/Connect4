@@ -29,7 +29,7 @@ class Game:
 
         self.current_state = BoardState(InternalState(INITIAL_STATE))
 
-        self.K = 2#int(input("Enter K (max depth of tree): "))
+        self.K = 2  # int(input("Enter K (max depth of tree): "))
 
         self.initialiseBoard()
 
@@ -52,7 +52,7 @@ class Game:
                 quit(0)
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if self.minimax_btn.collidepoint(event.pos):
-                    
+
                     self.mode = MINIMAX
                     self.minimax = Minimax(self.mode, self.K, self.ai)
                     # self.player = HUMAN if self.player == AI else AI
@@ -87,8 +87,6 @@ class Game:
             # print(score)
             self.minimax.draw_tree()
             self.minimax.tree_svg()
-            
-
 
     # Creates new disk objects if need or updates existing objects
     def set_disks(self):
@@ -136,16 +134,16 @@ class Game:
     def handle_human_move(self, col):
         self.current_state, ret = self.current_state.insert(col, self.human)
         if ret:
-          # print(self.current_state.state.get_numpy_format())
-          self.player = AI 
-          self.player1 = not self.player1 # Switch to AI after the human move
+            # print(self.current_state.state.get_numpy_format())
+            self.player = AI
+            self.player1 = not self.player1  # Switch to AI after the human move
 
     def handle_ai_move(self, col):
         self.current_state, ret = self.current_state.insert(col, self.ai)
         if ret:
-          # print(self.current_state.state.get_numpy_format())
-          self.player1 = not self.player1 # Switch to AI after the human move
-          self.player = HUMAN  # Switch to AI after the human move
+            # print(self.current_state.state.get_numpy_format())
+            self.player1 = not self.player1  # Switch to AI after the human move
+            self.player = HUMAN  # Switch to AI after the human move
 
     def game_end(self):
         return self.current_state.is_terminal()

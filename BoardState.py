@@ -1,8 +1,10 @@
 import numpy as np
-from constants import EMPTY, HUMAN, AI, COLUMNS, ROWS, COLUMN_BITS, ROW_BITS, ONE_END_OPEN_BIAS, THREES_BIAS, FOURS_BIAS, INITIAL_STATE, CENTER_BIAS, ADJACENT_BIAS
+from constants import EMPTY, HUMAN, AI, COLUMNS, ROWS, COLUMN_BITS, ROW_BITS, ONE_END_OPEN_BIAS, THREES_BIAS, \
+    FOURS_BIAS, INITIAL_STATE, CENTER_BIAS, ADJACENT_BIAS
 from InternalState import InternalState
 import random
 import uuid
+
 
 class BoardState:
     def __init__(self, state: InternalState):
@@ -27,7 +29,7 @@ class BoardState:
                 columns_available.append(col)
         return columns_available
 
-    def insert(self, col: int, player: int) -> 'BoardState':
+    def insert(self, col: int, player: int) -> ('BoardState', bool):
         if col in self.get_possible_moves():
             column_representation, start, end = self.get_column_representation(col)
             # -----------
@@ -40,7 +42,7 @@ class BoardState:
             #  inserting the new disk
             # print(f"player in insert {player}")
             new_disks = self.replace_character_in_string(disks, num_rows_occupied - 1,
-                                                        str(self.get_player_binary(player)))
+                                                         str(self.get_player_binary(player)))
 
             # print(f"newdisks: {new_disks}")
             new_column_representation = new_rows_string + new_disks
@@ -94,18 +96,19 @@ class BoardState:
 
         return neighbors
 
-    def is_terminal(self):
-        return all(self.state.get_binary_state()[i:i+3] == '110' for i in range(0, len(self.state.get_binary_state()), 9))
+    def is_terminal(self):  # only works for 6x7
+        return all(
+            self.state.get_binary_state()[i:i + 3] == '110' for i in range(0, len(self.state.get_binary_state()), 9))
 
     def get_heuristic(self, maximizer, minimizer):
         threes = self.getConnected3s(maximizer) - self.getConnected3s(minimizer)
         fours = self.getConnected4s(maximizer) - self.getConnected4s(minimizer)
         central = self.getCenterDistribution(maximizer) - self.getCenterDistribution(minimizer)
-        empty = self.getAdjecentEmpty(maximizer) - self.getAdjecentEmpty(minimizer)
+        empty = self.getAdjacentEmpty(maximizer) - self.getAdjacentEmpty(minimizer)
 
         return FOURS_BIAS * fours + THREES_BIAS * threes + CENTER_BIAS * central + ADJACENT_BIAS * empty
         # return random.randint(-5,5)
-    
+
     def get_score(self, maximizer, minimizer):
         return self.getConnected4s(maximizer) - self.getConnected4s(minimizer)
 
@@ -114,75 +117,143 @@ class BoardState:
         current_state = self.state.get_numpy_format()
         # check rows
         for row in current_state:
-            for i in range(0, COLUMNS-3):
-                if row[i] == player and row[i+1] == player and row[i+2] == player and row[i+3] == player:
+            for i in range(0, COLUMNS - 3):
+                if row[i] == player and row[i + 1] == player and row[i + 2] == player and row[i + 3] == player:
                     count += 1
         # check columns
         for col in range(COLUMNS):
-            for i in range(0, ROWS-3):
-                if current_state[i][col] == player and current_state[i+1][col] == player and current_state[i+2][col] == player and current_state[i+3][col] == player:
+            for i in range(0, ROWS - 3):
+                if current_state[i][col] == player and current_state[i + 1][col] == player and current_state[i + 2][
+                    col] == player and current_state[i + 3][col] == player:
                     count += 1
         # check +ve diagonals
-        for i in range(0, ROWS-3):
-            for j in range(0, COLUMNS-3):
-                if current_state[i][j] == player and current_state[i+1][j+1] == player and current_state[i+2][j+2] == player and current_state[i+3][j+3] == player:
+        for i in range(0, ROWS - 3):
+            for j in range(0, COLUMNS - 3):
+                if current_state[i][j] == player and current_state[i + 1][j + 1] == player and current_state[i + 2][
+                    j + 2] == player and current_state[i + 3][j + 3] == player:
                     count += 1
         # check -ve diagonals 
-        for i in range(0, ROWS-3):
+        for i in range(0, ROWS - 3):
             for j in range(3, COLUMNS):
-                if current_state[i][j] == player and current_state[i+1][j-1] == player and current_state[i+2][j-2] == player and current_state[i+3][j-3] == player:
-                    count += 1       
+                if current_state[i][j] == player and current_state[i + 1][j - 1] == player and current_state[i + 2][
+                    j - 2] == player and current_state[i + 3][j - 3] == player:
+                    count += 1
         return count
-    
+
     def getConnected3s(self, player):
-      Current_state = self.state.get_numpy_format()
-      count = 0
-      ROWS, COLUMNS = Current_state.shape
-
-      # Check rows
-      for row in range(ROWS):
-          for col in range(COLUMNS - 2):  # Ensure there are at least 3 columns remaining
-              if (Current_state[row][col] == player and
-                  Current_state[row][col+1] == player and
-                  Current_state[row][col+2] == player):
-                  count += 1
-
-      # Check columns
-      for col in range(COLUMNS):
-          for row in range(ROWS - 2):  # Ensure there are at least 3 rows remaining
-              if (Current_state[row][col] == player and
-                  Current_state[row+1][col] == player and
-                  Current_state[row+2][col] == player):
-                  count += 1
-
-      # Check positive diagonals
-      for row in range(ROWS - 2):  # Ensure there are at least 3 rows remaining
-          for col in range(COLUMNS - 2):  # Ensure there are at least 3 columns remaining
-              if (Current_state[row][col] == player and
-                  Current_state[row+1][col+1] == player and
-                  Current_state[row+2][col+2] == player):
-                  count += 1
-
-      # Check negative diagonals
-      for row in range(ROWS - 2):  # Ensure there are at least 3 rows remaining
-          for col in range(2, COLUMNS):  # Ensure there are at least 3 columns remaining
-              if (Current_state[row][col] == player and
-                  Current_state[row+1][col-1] == player and
-                  Current_state[row+2][col-2] == player):
-                  count += 1
-
-      return count
-            
-    def getCenterDistribution(self, player):
         Current_state = self.state.get_numpy_format()
         count = 0
+
+        # Check rows
+        for row in range(ROWS):
+            for col in range(COLUMNS - 2):  # Ensure there are at least 3 columns remaining
+                if (Current_state[row][col] == player and
+                        Current_state[row][col + 1] == player and
+                        Current_state[row][col + 2] == player):
+                    count += 1
+
+        # Check columns
+        for col in range(COLUMNS):
+            for row in range(ROWS - 2):  # Ensure there are at least 3 rows remaining
+                if (Current_state[row][col] == player and
+                        Current_state[row + 1][col] == player and
+                        Current_state[row + 2][col] == player):
+                    count += 1
+
+        # Check positive diagonals
+        for row in range(ROWS - 2):  # Ensure there are at least 3 rows remaining
+            for col in range(COLUMNS - 2):  # Ensure there are at least 3 columns remaining
+                if (Current_state[row][col] == player and
+                        Current_state[row + 1][col + 1] == player and
+                        Current_state[row + 2][col + 2] == player):
+                    count += 1
+
+        # Check negative diagonals
+        for row in range(ROWS - 2):  # Ensure there are at least 3 rows remaining
+            for col in range(2, COLUMNS):  # Ensure there are at least 3 columns remaining
+                if (Current_state[row][col] == player and
+                        Current_state[row + 1][col - 1] == player and
+                        Current_state[row + 2][col - 2] == player):
+                    count += 1
+
+        return count
+
+    def get_connected_4s(self, player):
+        count = 0
+        count += self.get_connected_n_row(4, player)
+        count += self.get_connected_n_column(4, player)
+        count += self.get_connected_pos_diagonal(4, player)
+        count += self.get_connected_neg_diagonal(4, player)
+        return count
+
+    def get_connected_3s(self, player):
+        count = 0
+        count += self.get_connected_n_row(3, player)
+        count += self.get_connected_n_column(3, player)
+        count += self.get_connected_pos_diagonal(3, player)
+        count += self.get_connected_neg_diagonal(3, player)
+        return count
+
+    def get_connected_2s(self, player):
+        count = 0
+        count += self.get_connected_n_row(2, player)
+        count += self.get_connected_n_column(2, player)
+        count += self.get_connected_pos_diagonal(2, player)
+        count += self.get_connected_neg_diagonal(2, player)
+        return count
+
+    def get_connected_n_row(self, n: int, player: int):
+        current_state = self.state.get_numpy_format()
+        count = 0
+        for row in current_state:
+            for i in range(0, COLUMNS - (n - 1)):
+                if all(row[i + k] == player for k in range(n)):
+                    count += 1
+        return count
+
+    def get_connected_n_column(self, n: int, player: int):
+        current_state = self.state.get_numpy_format()
+        count = 0
+        for col in current_state.T:
+            for i in range(0, COLUMNS - (n - 1)):
+                if all(col[i + k] == player for k in range(n)):
+                    count += 1
+        return count
+
+    def get_connected_pos_diagonal(self, n: int, player: int):
+        current_state = self.state.get_numpy_format()
+        count = 0
+        for i in range(ROWS - (n - 1)):  # Ensure there are at least 3 rows remaining
+            for j in range(COLUMNS - (n - 1)):  # Ensure there are at least 3 columns remaining
+                if all(current_state[i + k][j + k] == player for k in range(n)):
+                    count += 1
+        return count
+
+    def get_connected_neg_diagonal(self, n: int, player: int):
+        current_state = self.state.get_numpy_format()
+        count = 0
+        for i in range(ROWS - (n - 1)):
+            for j in range((n - 1), COLUMNS):
+                if all(current_state[i + k][j - k] == player for k in range(n)):
+                    count += 1
+        return count
+
+    def get_central_distribution(self, player):
+        current_state = self.state.get_numpy_format()
+        center_board = current_state[range(ROWS // 2), range(COLUMNS // 2)]
+        return np.count_nonzero(center_board == player)
+
+    def getCenterDistribution(self, player):
+        current_state = self.state.get_numpy_format()
+        count = 0
+        num = COLUMNS//2
         for row in range(ROWS):
             for col in range(COLUMNS):
-                if Current_state[row][col] == player:
-                    count += -abs(col - 3.5) + 3.5 
+                if current_state[row][col] == player:
+                    count += num - abs(num-col)
         return count
-    
-    def getAdjecentEmpty(self, player):
+
+    def getAdjacentEmpty(self, player):
         current_state = self.state.get_numpy_format()
         count = 0
         for row in range(ROWS):
@@ -208,31 +279,31 @@ class BoardState:
 
     def get_id(self):
         return self.tree_id
-    
+
     def __repr__(self) -> str:
         return str(self.state)
-    
+
     @staticmethod
     def list_to_boardstate(ls):
-      board = np.array(ls)
-      state_bits = []
-      for col in range(board.shape[1]):
-          column = board[:, col]
-          # Count the number of non-zero entries (disks) in the column
-          num_disks = np.count_nonzero(column)
-          # Convert the number of disks to a 3-bit binary representation
-          num_disks_bits = f'{num_disks:03b}'
-          # Get the disks and convert them to binary (0 for player 1, 1 for player 2)
-          disks_bits = ''.join('1' if disk == 2 else '0' for disk in column)
-          # Pad disks_bits to ensure it's always 6 bits long
-          disks_bits = disks_bits.zfill(6)[::-1]
-          # Combine the number of disks and the disks themselves
-          state_bits.append(num_disks_bits + disks_bits)
-          print(state_bits)
-      
-      # Combine all columns' binary representations into a single string
-      binary_string = ''.join(state_bits)
-      return BoardState(InternalState(int(binary_string, 2)))
+        board = np.array(ls)
+        state_bits = []
+        for col in range(board.shape[1]):
+            column = board[:, col]
+            # Count the number of non-zero entries (disks) in the column
+            num_disks = np.count_nonzero(column)
+            # Convert the number of disks to a 3-bit binary representation
+            num_disks_bits = f'{num_disks:03b}'
+            # Get the disks and convert them to binary (0 for player 1, 1 for player 2)
+            disks_bits = ''.join('1' if disk == 2 else '0' for disk in column)
+            # Pad disks_bits to ensure it's always 6 bits long
+            disks_bits = disks_bits.zfill(6)[::-1]
+            # Combine the number of disks and the disks themselves
+            state_bits.append(num_disks_bits + disks_bits)
+            print(state_bits)
+
+        # Combine all columns' binary representations into a single string
+        binary_string = ''.join(state_bits)
+        return BoardState(InternalState(int(binary_string, 2)))
 
 # binary_string = '010 000000 100 000100 001 100000 100 111000 011 001000 001 100000 000 000000'
 # binary_string2 = '010 000000 101 010100 001 100000 100 111000 011 001000 001 100000 000 000000'
