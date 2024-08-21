@@ -179,7 +179,7 @@ class BoardState:
         for row in range(ROWS):
             for col in range(COLUMNS):
                 if Current_state[row][col] == player:
-                    count += -abs(col - 3.5) + 3.5 
+                    count += abs(3 - col)
         return count
     
     def getAdjecentEmpty(self, player):
