@@ -74,12 +74,16 @@ class Minimax:
         parent_ids.append((id, depth))
     
     print(tree.show(stdout=False))
-    tree.to_graphviz("minimax.dot")
-    dot = pd.graph_from_dot_file("minimax.dot")
-    filename = "minimax.svg"
-    dot.write_svg(filename)
+    self.tree = tree
+    
       
   def reset_nodes(self):
     self.nodes = []
+
+  def tree_svg(self):
+    self.tree.to_graphviz("minimax.dot")
+    dot = pd.graph_from_dot_file("minimax.dot")
+    filename = "minimax.svg"
+    dot.write_svg(filename)
 
 

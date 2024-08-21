@@ -86,6 +86,7 @@ class Game:
             self.handle_ai_move(col)
             # print(score)
             self.minimax.draw_tree()
+            self.minimax.tree_svg()
             
 
 

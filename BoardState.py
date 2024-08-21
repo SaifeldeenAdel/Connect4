@@ -211,6 +211,28 @@ class BoardState:
     
     def __repr__(self) -> str:
         return str(self.state)
+    
+    @staticmethod
+    def list_to_boardstate(ls):
+      board = np.array(ls)
+      state_bits = []
+      for col in range(board.shape[1]):
+          column = board[:, col]
+          # Count the number of non-zero entries (disks) in the column
+          num_disks = np.count_nonzero(column)
+          # Convert the number of disks to a 3-bit binary representation
+          num_disks_bits = f'{num_disks:03b}'
+          # Get the disks and convert them to binary (0 for player 1, 1 for player 2)
+          disks_bits = ''.join('1' if disk == 2 else '0' for disk in column)
+          # Pad disks_bits to ensure it's always 6 bits long
+          disks_bits = disks_bits.zfill(6)[::-1]
+          # Combine the number of disks and the disks themselves
+          state_bits.append(num_disks_bits + disks_bits)
+          print(state_bits)
+      
+      # Combine all columns' binary representations into a single string
+      binary_string = ''.join(state_bits)
+      return BoardState(InternalState(int(binary_string, 2)))
 
 # binary_string = '010 000000 100 000100 001 100000 100 111000 011 001000 001 100000 000 000000'
 # binary_string2 = '010 000000 101 010100 001 100000 100 111000 011 001000 001 100000 000 000000'
@@ -218,11 +240,15 @@ class BoardState:
 #               '010 000000 100 000100 001 100000 100 111000 011 001000 101 01000000000000'
 # binary_string = 
 # decimal_number = int(binary_string.replace(" ", ""), 2)
-INITIAL_STAT = int('011 000000 000 000000 000 000000 010 101000 011 000000 000 000000 000 000000'.replace(" ", ""), 2)
-b = InternalState(INITIAL_STAT)
-bs = BoardState(b)
-print(bs.state.get_numpy_format())
-print(bs.getCenterDistribution(2))
-print(bs.getAdjecentEmpty(1))
-
+# INITIAL_STAT = int('011 000000 000 000000 000 000000 010 101000 011 000000 000 000000 000 000000'.replace(" ", ""), 2)
+# b = InternalState(INITIAL_STAT)
+# ls = [
+#     [0, 0, 0, 0, 0, 0, 0],
+#     [0, 0, 0, 0, 0, 0, 0],
+#     [0, 0, 0, 0, 0, 0, 0],
+#     [1, 0, 0, 0, 1, 0, 0],
+#     [1, 0, 0, 1, 1, 0, 0],
+#     [1, 0, 0, 2, 1, 0, 0]
+# ]
+# print(BoardState.list_to_boardstate(ls).state.get_numpy_format())
 # print("MAIN ")
