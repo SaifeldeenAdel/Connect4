@@ -3,6 +3,7 @@ from BoardState import BoardState
 import math
 import random
 from treelib import Tree
+import pydot_ng as pd
 
 class Minimax:
   def __init__(self, mode, depth, maximizer) -> None:
@@ -73,6 +74,10 @@ class Minimax:
         parent_ids.append((id, depth))
     
     print(tree.show(stdout=False))
+    tree.to_graphviz("minimax.dot")
+    dot = pd.graph_from_dot_file("minimax.dot")
+    filename = "minimax.svg"
+    dot.write_svg(filename)
       
   def reset_nodes(self):
     self.nodes = []

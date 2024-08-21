@@ -85,7 +85,8 @@ class Game:
             col, score = self.minimax.run(self.current_state, self.K, self.ai)
             self.handle_ai_move(col)
             # print(score)
-            # self.minimax.draw_tree()
+            self.minimax.draw_tree()
+            
 
 
     # Creates new disk objects if need or updates existing objects
