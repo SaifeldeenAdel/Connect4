@@ -119,7 +119,7 @@ class Game:
         color = (255, 0, 0) if self.player1 else (180, 140, 0)
         player_text = self.font.render(f"Player: {'HUMAN' if self.player is HUMAN else 'AI'}", True, color)
         mode = self.font.render(f"Mode: {self.mode}", True, (0, 0, 0))
-        over = self.font.render(f"{'GAME OVER' + self.current_state.get_score(AI,HUMAN) if self.game_end() else ''}", True, (0, 0, 0))
+        over = self.font.render(f"{'GAME OVER ' + str(self.current_state.get_score(AI,HUMAN)) if self.game_end() else ''}", True, (0, 0, 0))
         self.surface.blit(player_text, (WIDTH + 20, 100))
         self.surface.blit(mode, (WIDTH + 20, 600))
         self.surface.blit(over, (WIDTH + 20, 650))
