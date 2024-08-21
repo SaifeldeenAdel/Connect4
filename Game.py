@@ -1,3 +1,5 @@
+import time
+
 import pygame
 import numpy as np
 import random
@@ -21,7 +23,8 @@ class Game:
         self.player1 = True
         self.human = 1 if self.player == HUMAN else 2
         self.ai = 1 if self.player == AI else 2
-
+        self.iterations = 0
+        self.total_time = 0
         self.mode = None
         self.minimax = None
         self.tree = Tree()
@@ -30,7 +33,7 @@ class Game:
 
         self.current_state = BoardState(InternalState(INITIAL_STATE))
 
-        self.K = 4#int(input("Enter K (max depth of tree): "))
+        self.K = int(input("Enter K (max depth of tree): "))
 
         self.initialiseBoard()
 
@@ -50,10 +53,12 @@ class Game:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
+                print(f"Total time running = {self.total_time}")
+                print(f"Average time: {self.total_time/self.iterations}")
                 quit(0)
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if self.minimax_btn.collidepoint(event.pos):
-                    
+
                     self.mode = MINIMAX
                     self.minimax = Minimax(self.mode, self.K, self.ai)
                     # self.player = HUMAN if self.player == AI else AI
@@ -84,13 +89,15 @@ class Game:
         pygame.display.update()
         if self.player == AI and self.mode and not self.game_end():
             self.minimax.reset_nodes()
+            start = time.time()
             col, score = self.minimax.run(self.current_state, self.K, self.ai)
+            end = time.time()
             self.handle_ai_move(col)
             # print(score)
             self.minimax.draw_tree()
-            #self.minimax.tree_svg()
-            
-
+            self.iterations += 1
+            self.total_time += end - start
+            # self.minimax.tree_svg()
 
     # Creates new disk objects if need or updates existing objects
     def set_disks(self):
@@ -121,7 +128,8 @@ class Game:
         color = (255, 0, 0) if self.player1 else (180, 140, 0)
         player_text = self.font.render(f"Player: {'HUMAN' if self.player is HUMAN else 'AI'}", True, color)
         mode = self.font.render(f"Mode: {self.mode}", True, (0, 0, 0))
-        over = self.font.render(f"{'GAME OVER' + str(self.current_state.get_score(AI,HUMAN)) if self.game_end() else ''}", True, (0, 0, 0))
+        over = self.font.render(
+            f"{'GAME OVER' + str(self.current_state.get_score(AI, HUMAN)) if self.game_end() else ''}", True, (0, 0, 0))
         self.surface.blit(player_text, (WIDTH + 20, 100))
         self.surface.blit(mode, (WIDTH + 20, 600))
         self.surface.blit(over, (WIDTH + 20, 650))
@@ -138,16 +146,16 @@ class Game:
     def handle_human_move(self, col):
         self.current_state, ret = self.current_state.insert(col, self.human)
         if ret:
-          # print(self.current_state.state.get_numpy_format())
-          self.player = AI 
-          self.player1 = not self.player1 # Switch to AI after the human move
+            # print(self.current_state.state.get_numpy_format())
+            self.player = AI
+            self.player1 = not self.player1  # Switch to AI after the human move
 
     def handle_ai_move(self, col):
         self.current_state, ret = self.current_state.insert(col, self.ai)
         if ret:
-          # print(self.current_state.state.get_numpy_format())
-          self.player1 = not self.player1 # Switch to AI after the human move
-          self.player = HUMAN  # Switch to AI after the human move
+            # print(self.current_state.state.get_numpy_format())
+            self.player1 = not self.player1  # Switch to AI after the human move
+            self.player = HUMAN  # Switch to AI after the human move
 
     def game_end(self):
         return self.current_state.is_terminal()
