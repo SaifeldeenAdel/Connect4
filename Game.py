@@ -29,7 +29,7 @@ class Game:
 
         self.current_state = BoardState(InternalState(INITIAL_STATE))
 
-        self.K = 2#int(input("Enter K (max depth of tree): "))
+        self.K = 4#int(input("Enter K (max depth of tree): "))
 
         self.initialiseBoard()
 
@@ -86,7 +86,7 @@ class Game:
             self.handle_ai_move(col)
             # print(score)
             self.minimax.draw_tree()
-            self.minimax.tree_svg()
+            #self.minimax.tree_svg()
             
 
 
