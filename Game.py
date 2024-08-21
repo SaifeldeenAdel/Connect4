@@ -9,6 +9,7 @@ from InternalState import InternalState
 from Disk import Disk
 from Minimax import Minimax
 from A_B_pruning import A_B_pruning
+from Expecti import Expecti
 
 from constants import EMPTY, HUMAN, AI
 from constants import WIDTH, HEIGHT, COLUMNS, ROWS, CELL_SIZE, INITIAL_STATE
@@ -69,6 +70,7 @@ class Game:
 
                 elif self.expecti_btn.collidepoint(event.pos):
                     self.mode = EXPECTI
+                    self.minimax = Expecti(self.mode, self.K, self.ai)
                 else:
                     # Handle human move
                     if self.player == HUMAN and not self.game_end():
