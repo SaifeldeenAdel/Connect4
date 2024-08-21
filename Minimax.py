@@ -27,7 +27,7 @@ class Minimax:
       value = -math.inf
       column = random.choice(cols)
       for col, neighbor in neighbors:
-        new_score = self.run(neighbor, depth-1, HUMAN)[1]
+        new_score = self.run(neighbor, depth-1, self.minimizer)[1]
         if new_score > value:
           value  = new_score
           column = col
@@ -37,7 +37,7 @@ class Minimax:
       value = math.inf
       column = random.choice(cols)
       for col, neighbor in neighbors:
-        new_score = self.run(neighbor, depth-1, AI)[1]
+        new_score = self.run(neighbor, depth-1, self.maximizer)[1]
         if new_score < value:
           value  = new_score
           column = col
