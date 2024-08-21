@@ -17,6 +17,8 @@ class Game:
         pygame.init()
         self.playing = False
         self.player = HUMAN if random.random() >= 0.5 else AI
+        self.maximizer = self.player
+        self.minimiser = 1 if self.maximizer == 2 else 1
         self.player1 = True
         self.human = 1 if self.player == HUMAN else 2
         self.ai = 1 if self.player == AI else 2
@@ -27,7 +29,7 @@ class Game:
 
         self.disks = [0 for _ in range(42)]  # Pool of disks to use
 
-        self.current_state = BoardState(InternalState(INITIAL_STATE))
+        self.current_state = BoardState(InternalState(INITIAL_STATE), self.player)
 
         self.K = 2  # int(input("Enter K (max depth of tree): "))
 
@@ -54,8 +56,9 @@ class Game:
                 if self.minimax_btn.collidepoint(event.pos):
 
                     self.mode = MINIMAX
-                    self.minimax = Minimax(self.mode, self.K, self.ai)
+                    self.minimax = Minimax(self.mode, self.K, self.maximizer)  # telling AI is maximizer
                     # self.player = HUMAN if self.player == AI else AI
+                    # elf.minimax2 = minimax2(self.maximizer, self.minimiser)
 
                 elif self.pruning_btn.collidepoint(event.pos):
                     self.mode = MINIMAX_PRUNE
@@ -82,11 +85,12 @@ class Game:
         pygame.display.update()
         if self.player == AI and self.mode and not self.game_end():
             self.minimax.reset_nodes()
-            col, score = self.minimax.run(self.current_state, self.K, self.ai)
+            col, score = self.minimax.run(self.current_state, self.K, self.ai)  # got to start with AI
+
             self.handle_ai_move(col)
             # print(score)
             self.minimax.draw_tree()
-            self.minimax.tree_svg()
+            # self.minimax.tree_svg()
 
     # Creates new disk objects if need or updates existing objects
     def set_disks(self):
@@ -132,14 +136,14 @@ class Game:
         return rect
 
     def handle_human_move(self, col):
-        self.current_state, ret = self.current_state.insert(col, self.human)
+        self.current_state, ret = self.current_state.insert(col)
         if ret:
             # print(self.current_state.state.get_numpy_format())
             self.player = AI
             self.player1 = not self.player1  # Switch to AI after the human move
 
     def handle_ai_move(self, col):
-        self.current_state, ret = self.current_state.insert(col, self.ai)
+        self.current_state, ret = self.current_state.insert(col)
         if ret:
             # print(self.current_state.state.get_numpy_format())
             self.player1 = not self.player1  # Switch to AI after the human move

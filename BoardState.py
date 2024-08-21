@@ -7,10 +7,11 @@ import uuid
 
 
 class BoardState:
-    def __init__(self, state: InternalState):
+    def __init__(self, state: InternalState, next_player: int):
         self.state = state
         self.score = 0
         self.tree_id = uuid.uuid4()
+        self.next_player = next_player
 
     def get_possible_moves(self) -> list[int]:
         #  0 in array -> EMPTY
@@ -29,7 +30,7 @@ class BoardState:
                 columns_available.append(col)
         return columns_available
 
-    def insert(self, col: int, player: int) -> ('BoardState', bool):
+    def insert(self, col: int) -> ('BoardState', bool):
         if col in self.get_possible_moves():
             column_representation, start, end = self.get_column_representation(col)
             # -----------
@@ -42,7 +43,7 @@ class BoardState:
             #  inserting the new disk
             # print(f"player in insert {player}")
             new_disks = self.replace_character_in_string(disks, num_rows_occupied - 1,
-                                                         str(self.get_player_binary(player)))
+                                                         str(self.get_player_binary(self.next_player)))
 
             # print(f"newdisks: {new_disks}")
             new_column_representation = new_rows_string + new_disks
@@ -51,7 +52,7 @@ class BoardState:
             new_binary_state = self.get_new_binary_state(start, new_column_representation, end)
             # print(f"newbinaryrep {new_binary_representation}")
             decimal = int(new_binary_state, 2)
-            return BoardState(InternalState(decimal)), True
+            return BoardState(InternalState(decimal), 1 if self.next_player == 2 else 2), True
         print(f"ERROR CAN NOT INSERT IN COLUMN {col}")
         return self, False
 
@@ -85,13 +86,12 @@ class BoardState:
         binary_state = '0' * (3 - len(binary_state)) + binary_state
         return binary_state
 
-    def get_neighbors(self, player: int):
+    def get_neighbors(self):
         neighbors = []
         possible_moves = self.get_possible_moves()
-        opposing = 1 if player == 2 else 2
 
         for col in possible_moves:
-            next_state, _ = self.insert(col, opposing)
+            next_state, _ = self.insert(col)
             neighbors.append((col, next_state))
 
         return neighbors
@@ -246,11 +246,11 @@ class BoardState:
     def getCenterDistribution(self, player):
         current_state = self.state.get_numpy_format()
         count = 0
-        num = COLUMNS//2
+        num = COLUMNS // 2
         for row in range(ROWS):
             for col in range(COLUMNS):
                 if current_state[row][col] == player:
-                    count += num - abs(num-col)
+                    count += num - abs(num - col)
         return count
 
     def getAdjacentEmpty(self, player):

@@ -18,7 +18,7 @@ class Minimax:
 
     def run(self, state: BoardState, depth, player):
         # print(state)
-        neighbors = state.get_neighbors(player)
+        neighbors = state.get_neighbors()
         cols = [neighbor[0] for neighbor in neighbors]
         # print("Running minimax")
         if state.is_terminal() or depth == 0:
@@ -31,6 +31,7 @@ class Minimax:
             return None, score
 
         if player == self.maximizer:  # Maximizer
+            print("maximiser")
             value = -math.inf
             column = None
             for col, neighbor in neighbors:
@@ -41,7 +42,8 @@ class Minimax:
             self.nodes.append((state.get_id(), value, depth))
             return column, value
 
-        else:  # Minimizer
+        elif player == self.minimizer:  # Minimizer
+            print("minimiser")
             value = math.inf
             column = None
             for col, neighbor in neighbors:
