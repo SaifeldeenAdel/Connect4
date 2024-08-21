@@ -1,13 +1,14 @@
 import numpy as np
 from constants import EMPTY, HUMAN, AI, COLUMNS, ROWS, COLUMN_BITS, ROW_BITS, ONE_END_OPEN_BIAS, THREES_BIAS, FOURS_BIAS
 from InternalState import InternalState
-
+import random
+import uuid
 
 class BoardState:
     def __init__(self, state: InternalState):
         self.state = state
         self.score = 0
-        self.tree_id = self.state.get_decimal_state()
+        self.tree_id = uuid.uuid4()
 
     def get_possible_moves(self) -> list[int]:
         #  0 in array -> EMPTY
@@ -97,9 +98,10 @@ class BoardState:
         return all(self.state.get_binary_state()[i:i+3] == '110' for i in range(0, len(self.state.get_binary_state()), 9))
 
     def get_heuristic(self, maximizer, minimizer):
-        threes = self.__getConnected3s(maximizer) - self.__getConnected3s(minimizer)
-        fours = self.__getConnected4s(maximizer) - self.__getConnected4s(minimizer)
-        return FOURS_BIAS * fours + THREES_BIAS * threes
+        # threes = self.__getConnected3s(maximizer) - self.__getConnected3s(minimizer)
+        # fours = self.__getConnected4s(maximizer) - self.__getConnected4s(minimizer)
+        # return FOURS_BIAS * fours + THREES_BIAS * threes
+        return random.randint(-5,5)
     
     def get_score(self, maximizer, minimizer):
         return self.__getConnected4s(maximizer) - self.__getConnected4s(minimizer)
@@ -128,6 +130,7 @@ class BoardState:
                 if current_state[i][j] == player and current_state[i+1][j-1] == player and current_state[i+2][j-2] == player and current_state[i+3][j-3] == player:
                     count += 1       
         return count
+    
     def __getConnected3s(self, player):
         Current_state = self.state.get_numpy_format()
         count = 0
@@ -203,6 +206,9 @@ class BoardState:
                         count += 1
         return count
 
+    def get_id(self):
+        return self.tree_id
+    
     def __repr__(self) -> str:
         return str(self.state)
 

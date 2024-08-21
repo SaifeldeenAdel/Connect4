@@ -29,7 +29,7 @@ class Game:
 
         self.current_state = BoardState(InternalState(INITIAL_STATE))
 
-        self.K = 3 #int(input("Enter K (max depth of tree): "))
+        self.K = 2#int(input("Enter K (max depth of tree): "))
 
         self.initialiseBoard()
 
@@ -54,7 +54,7 @@ class Game:
                 if self.minimax_btn.collidepoint(event.pos):
                     
                     self.mode = MINIMAX
-                    self.minimax = Minimax(self.mode, self.ai)
+                    self.minimax = Minimax(self.mode, self.K, self.ai)
                     # self.player = HUMAN if self.player == AI else AI
 
                 elif self.pruning_btn.collidepoint(event.pos):
@@ -82,7 +82,8 @@ class Game:
         if self.player == AI and self.mode and not self.game_end():
             col, score = self.minimax.run(self.current_state, self.K, self.ai)
             self.handle_ai_move(col)
-            print(score)
+            # print(score)
+            self.minimax.draw_tree()
 
         pygame.display.update()
 
@@ -132,14 +133,14 @@ class Game:
     def handle_human_move(self, col):
         self.current_state, ret = self.current_state.insert(col, self.human)
         if ret:
-          print(self.current_state.state.get_numpy_format())
+          # print(self.current_state.state.get_numpy_format())
           self.player = AI 
           self.player1 = not self.player1 # Switch to AI after the human move
 
     def handle_ai_move(self, col):
         self.current_state, ret = self.current_state.insert(col, self.ai)
         if ret:
-          print(self.current_state.state.get_numpy_format())
+          # print(self.current_state.state.get_numpy_format())
           self.player1 = not self.player1 # Switch to AI after the human move
           self.player = HUMAN  # Switch to AI after the human move
 
