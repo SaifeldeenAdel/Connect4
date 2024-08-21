@@ -79,13 +79,14 @@ class Game:
             if disk:
                 disk.draw(self.surface)
 
+        pygame.display.update()
         if self.player == AI and self.mode and not self.game_end():
+            self.minimax.reset_nodes()
             col, score = self.minimax.run(self.current_state, self.K, self.ai)
             self.handle_ai_move(col)
             # print(score)
-            self.minimax.draw_tree()
+            # self.minimax.draw_tree()
 
-        pygame.display.update()
 
     # Creates new disk objects if need or updates existing objects
     def set_disks(self):

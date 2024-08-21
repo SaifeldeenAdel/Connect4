@@ -74,6 +74,7 @@ class Minimax:
     
     print(tree.show(stdout=False))
       
-
+  def reset_nodes(self):
+    self.nodes = []
 
 

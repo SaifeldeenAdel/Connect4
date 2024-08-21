@@ -1,5 +1,5 @@
 import numpy as np
-from constants import EMPTY, HUMAN, AI, COLUMNS, ROWS, COLUMN_BITS, ROW_BITS, ONE_END_OPEN_BIAS, THREES_BIAS, FOURS_BIAS
+from constants import EMPTY, HUMAN, AI, COLUMNS, ROWS, COLUMN_BITS, ROW_BITS, ONE_END_OPEN_BIAS, THREES_BIAS, FOURS_BIAS, INITIAL_STATE, CENTER_BIAS, ADJACENT_BIAS
 from InternalState import InternalState
 import random
 import uuid
@@ -98,15 +98,18 @@ class BoardState:
         return all(self.state.get_binary_state()[i:i+3] == '110' for i in range(0, len(self.state.get_binary_state()), 9))
 
     def get_heuristic(self, maximizer, minimizer):
-        # threes = self.__getConnected3s(maximizer) - self.__getConnected3s(minimizer)
-        # fours = self.__getConnected4s(maximizer) - self.__getConnected4s(minimizer)
-        # return FOURS_BIAS * fours + THREES_BIAS * threes
-        return random.randint(-5,5)
+        threes = self.getConnected3s(maximizer) - self.getConnected3s(minimizer)
+        fours = self.getConnected4s(maximizer) - self.getConnected4s(minimizer)
+        central = self.getCenterDistribution(maximizer) - self.getCenterDistribution(minimizer)
+        empty = self.getAdjecentEmpty(maximizer) - self.getAdjecentEmpty(minimizer)
+
+        return FOURS_BIAS * fours + THREES_BIAS * threes + CENTER_BIAS * central + ADJACENT_BIAS * empty
+        # return random.randint(-5,5)
     
     def get_score(self, maximizer, minimizer):
-        return self.__getConnected4s(maximizer) - self.__getConnected4s(minimizer)
+        return self.getConnected4s(maximizer) - self.getConnected4s(minimizer)
 
-    def __getConnected4s(self, player):
+    def getConnected4s(self, player):
         count = 0
         current_state = self.state.get_numpy_format()
         # check rows
@@ -131,49 +134,46 @@ class BoardState:
                     count += 1       
         return count
     
-    def __getConnected3s(self, player):
-        Current_state = self.state.get_numpy_format()
-        count = 0
-        # check rows
-        for row in range(ROWS):
-            for i in range(0, COLUMNS-2):
-                if(i == 0):
-                    if Current_state[row][i] == player and Current_state[row][i+1] == player and Current_state[row][i+2] == player and Current_state[row][i+3] == EMPTY:
-                        count += 1* ONE_END_OPEN_BIAS
-                else:
-                    if Current_state[row][i] == player and Current_state[row][i+1] == player and Current_state[row][i+2] == player and Current_state[row][i+3] == EMPTY and Current_state[row][i-1] == EMPTY:
-                        count += 1
-        # check columns
-        for col in range(COLUMNS):
-            for i in range(0, ROWS-2):
-                if(i == 0):
-                    if Current_state[i][col] == player and Current_state[i+1][col] == player and Current_state[i+2][col] == player and Current_state[i+3][col] == EMPTY:
-                        count += 1* ONE_END_OPEN_BIAS
-                else:
-                    if Current_state[i][col] == player and Current_state[i+1][col] == player and Current_state[i+2][col] == player and Current_state[i-1][col] == EMPTY and Current_state[i+3][col] == EMPTY:
-                        count += 1
-        #check +ve diagonals
-        for i in range(0, ROWS-2):
-            for j in range(0, COLUMNS-2):
-                if(i == 0):
-                    if Current_state[i][j] == player and Current_state[i+1][j+1] == player and Current_state[i+2][j+2] == player and Current_state[i+3][j+3] == EMPTY:
-                        count += 1* ONE_END_OPEN_BIAS
-                else:
-                    if Current_state[i][j] == player and Current_state[i+1][j+1] == player and Current_state[i+2][j+2] == player and Current_state[i-1][j-1] == EMPTY and Current_state[i+3][j+3] == EMPTY:
-                        count += 1
-        #check -ve diagonals
-        for i in range(0, ROWS-2):
-            for j in range(3, COLUMNS):
-                if(i == 0):
-                    if Current_state[i][j] == player and Current_state[i+1][j-1] == player and Current_state[i+2][j-2] == player and Current_state[i+3][j-3] == EMPTY:
-                        count += 1* ONE_END_OPEN_BIAS
-                else:
-                    if Current_state[i][j] == player and Current_state[i+1][j-1] == player and Current_state[i+2][j-2] == player and Current_state[i-1][j+1] == EMPTY and Current_state[i+3][j-3] == EMPTY:
-                        count += 1
-        return count
+    def getConnected3s(self, player):
+      Current_state = self.state.get_numpy_format()
+      count = 0
+      ROWS, COLUMNS = Current_state.shape
 
+      # Check rows
+      for row in range(ROWS):
+          for col in range(COLUMNS - 2):  # Ensure there are at least 3 columns remaining
+              if (Current_state[row][col] == player and
+                  Current_state[row][col+1] == player and
+                  Current_state[row][col+2] == player):
+                  count += 1
+
+      # Check columns
+      for col in range(COLUMNS):
+          for row in range(ROWS - 2):  # Ensure there are at least 3 rows remaining
+              if (Current_state[row][col] == player and
+                  Current_state[row+1][col] == player and
+                  Current_state[row+2][col] == player):
+                  count += 1
+
+      # Check positive diagonals
+      for row in range(ROWS - 2):  # Ensure there are at least 3 rows remaining
+          for col in range(COLUMNS - 2):  # Ensure there are at least 3 columns remaining
+              if (Current_state[row][col] == player and
+                  Current_state[row+1][col+1] == player and
+                  Current_state[row+2][col+2] == player):
+                  count += 1
+
+      # Check negative diagonals
+      for row in range(ROWS - 2):  # Ensure there are at least 3 rows remaining
+          for col in range(2, COLUMNS):  # Ensure there are at least 3 columns remaining
+              if (Current_state[row][col] == player and
+                  Current_state[row+1][col-1] == player and
+                  Current_state[row+2][col-2] == player):
+                  count += 1
+
+      return count
             
-    def __getCenterDistribution(self, player):
+    def getCenterDistribution(self, player):
         Current_state = self.state.get_numpy_format()
         count = 0
         for row in range(ROWS):
@@ -182,7 +182,7 @@ class BoardState:
                     count += -abs(col - 3.5) + 3.5 
         return count
     
-    def __getAdjecentEmpty(self, player):
+    def getAdjecentEmpty(self, player):
         current_state = self.state.get_numpy_format()
         count = 0
         for row in range(ROWS):
@@ -212,15 +212,17 @@ class BoardState:
     def __repr__(self) -> str:
         return str(self.state)
 
-# binary_string = '010 000000 100 000001 001 000001 100 001110 011 000001 001 000001 000 000000'
 # binary_string = '010 000000 100 000100 001 100000 100 111000 011 001000 001 100000 000 000000'
 # binary_string2 = '010 000000 101 010100 001 100000 100 111000 011 001000 001 100000 000 000000'
 #              '010 000000 100 000100 001 100000 100 111000 011 001000 101 010000 000 00000'
 #               '010 000000 100 000100 001 100000 100 111000 011 001000 101 01000000000000'
+# binary_string = 
 # decimal_number = int(binary_string.replace(" ", ""), 2)
+INITIAL_STAT = int('011 000000 000 000000 000 000000 010 101000 011 000000 000 000000 000 000000'.replace(" ", ""), 2)
+b = InternalState(INITIAL_STAT)
+bs = BoardState(b)
+print(bs.state.get_numpy_format())
+print(bs.getCenterDistribution(2))
+print(bs.getAdjecentEmpty(1))
 
-# b = InternalState(decimal_number)
-
-# bs = BoardState(b)
 # print("MAIN ")
-# print(bs.state.get_numpy_format())
