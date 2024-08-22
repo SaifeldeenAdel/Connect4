@@ -209,6 +209,7 @@ class BoardState:
     def get_id(self):
         return self.tree_id
     
+    
     def __repr__(self) -> str:
         return str(self.state)
     

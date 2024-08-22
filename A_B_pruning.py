@@ -5,7 +5,15 @@ import random
 from treelib import Tree
 import pydot_ng as pd
 
-class A_B_pruning:
+class A_B_pruning:    
+    _instance = None
+
+    @staticmethod
+    def get_instance():
+        if A_B_pruning._instance is None:
+            A_B_pruning._instance = A_B_pruning()
+        return A_B_pruning._instance
+
     def __init__(self, mode, depth, maximizer) -> None:
         self.mode = mode
         self.maximizer = maximizer

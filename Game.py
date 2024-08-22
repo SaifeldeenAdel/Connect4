@@ -99,7 +99,7 @@ class Game:
             self.minimax.draw_tree()
             self.iterations += 1
             self.total_time += end - start
-            # self.minimax.tree_svg()
+            self.minimax.tree_svg()
 
     # Creates new disk objects if need or updates existing objects
     def set_disks(self):
