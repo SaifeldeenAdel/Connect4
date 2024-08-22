@@ -100,6 +100,8 @@ class Expecti:
         print(tree.show(stdout=False))
         self.tree = tree
 
+    def get_number_nodes(self):
+        return len(self.nodes)
 
     def reset_nodes(self):
         self.nodes = [   ]

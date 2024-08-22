@@ -56,6 +56,7 @@ class Game:
                 pygame.quit()
                 print(f"Total time running = {self.total_time}")
                 print(f"Average time: {self.total_time/self.iterations}")
+                print(f"Number of nodes ex[anded: {self.number_nodes_expanded}")
                 quit(0)
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if self.minimax_btn.collidepoint(event.pos):
@@ -96,7 +97,9 @@ class Game:
             end = time.time()
             self.handle_ai_move(col)
             # print(score)
+            self.number_nodes_expanded = self.minimax.get_number_nodes()
             self.minimax.draw_tree()
+
             self.iterations += 1
             self.total_time += end - start
             # self.minimax.tree_svg()
